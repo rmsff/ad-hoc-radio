@@ -1,0 +1,13 @@
+ADHR_RX_ONLY:v1
+WADHR1 ERROR code=internal_overflow
+ADHR1 ERROR code=malformed_command operation=%s
+ADHR1 OK op=ping version=1 rx_only=1
+ADHR1 EVENT op=reset reset_generation=%lu monotonic_ms=%llu next_obs_seq=0
+ADHR1 EVENT op=receive_delivery obs_seq=%lu monotonic_ms=%llu rssi_dbm=%ld frame_bytes=%s frame_size_bytes=%zu
+ADHR1 EVENT op=link_measurement obs_seq=%lu observed_at_ms=%llu from_station_id=%s to_station_id=%s rssi_dbm=%ld loss_milli_pct=%llu delay_ms=%llu
+ADHR1 EVENT op=timing_observation obs_seq=%lu monotonic_ms=%llu timing_authority_id=%s timing_epoch_id=%s acquisition_ms=%llu drift_ppm=%ld
+ADHR1 ERROR code=unsupported_operation operation=scheduled_transmit
+ADHR1 ERROR code=unknown_operation operation=%s
+ADHR1 ERROR code=line_overflow
+ADHR1 ERROR code=command_timeout
+ADHR1 ERROR code=output_backpressure dropped=%lu

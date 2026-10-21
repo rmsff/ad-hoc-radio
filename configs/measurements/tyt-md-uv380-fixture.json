@@ -1,0 +1,18 @@
+{
+  "scenario_id": "tyt_tx_rx_switch_bench_measurement",
+  "seed": 42,
+  "measurement_source": "fixture_only",
+  "radio_model": "TYT MD-UV380 / MD-UV3x0 class",
+  "test_fixture": true,
+  "measurement_artifact_ref": "",
+  "firmware_path": "openrtx_derived_bench",
+  "channel_width_hz": 25000,
+  "gross_bitrate_bps": 19200,
+  "preamble_ms": 1,
+  "sync_ms": 1,
+  "link_delay_ms": 1,
+  "rx_to_tx_samples_ms": [6, 8, 8],
+  "tx_to_rx_samples_ms": [7, 8, 8],
+  "rx_valid_after_tx_samples_ms": [1, 1, 2],
+  "notes": "fixture-only test data, not a hardware claim"
+}

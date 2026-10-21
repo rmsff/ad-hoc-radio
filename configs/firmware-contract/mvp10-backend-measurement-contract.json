@@ -1,0 +1,168 @@
+{
+  "schema_version": "adhr-backend-measurement-v1",
+  "story_id": "MVP-10.2",
+  "handoff_contract_sha256": "d97a01b0160fe2c125574ffc1c1125a9da20c2d20e0508d35d565977d38ec39a",
+  "selection_report_sha256": "e83f4b00fa43e75b8483d6158fa30951c2ba956893fe9269e9f8cef3d81a630b",
+  "candidate": {
+    "candidate_id": "openrtx_mduv3x0",
+    "profile_id": "source_led/project_native_variable",
+    "firmware_base": "OpenRTX v0.4.4",
+    "source_ref": "https://github.com/OpenRTX/OpenRTX.git",
+    "source_revision": "801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+    "target": "mduv3x0",
+    "firmware_sha256": "8eda5a79619c2c79295a6a58def0d27c95f43d91348579a9e593960a6205c4a0",
+    "binary_sha256": "4b204484783ba1660bf0275030d1b6d110a2f5dfcae0ae66c7de42efc069b748"
+  },
+  "definition": {
+    "gate_name": "channel_capacity",
+    "kind": "channel_capacity",
+    "start_marker": "external_test_frame_start",
+    "end_marker": "valid_receiver_frame_completion"
+  },
+  "clock": {
+    "status": "unknown",
+    "backend_clock_id": "unknown",
+    "resolution_ns": 0
+  },
+  "units": {
+    "duration": "microseconds",
+    "payload": "bytes",
+    "overhead": "bytes",
+    "bit_errors": "count",
+    "frame_errors": "count",
+    "frames_lost": "count",
+    "boundary_error": "microseconds",
+    "drift": "milli_ppm",
+    "guard": "microseconds",
+    "resync": "count"
+  },
+  "trial_plan": {
+    "planned_trial_count": 2,
+    "minimum_sample_count": 2,
+    "minimum_samples_per_case": 2,
+    "warmup_count": 1,
+    "matrix_cases": [
+      {
+        "case_id": "channel-profile-001",
+        "profile_id": "source_led/project_native_variable",
+        "state_condition": "nominal",
+        "power_profile": "receive_only",
+        "expected_outcome": "success",
+        "channel": {
+          "channel_rate_bps": 9600,
+          "payload_bytes": 16,
+          "overhead_bytes": 8,
+          "required_frame_bytes": 20,
+          "guard_margin_bytes": 4
+        }
+      }
+    ]
+  },
+  "thresholds": {
+    "version": "adhr-backend-thresholds-v1",
+    "duration": {
+      "p95_max_us": 50000,
+      "max_us": 80000,
+      "max_failed_samples": 0
+    },
+    "channel": {
+      "max_bit_errors": 0,
+      "max_frame_errors": 0,
+      "max_frames_lost": 0
+    },
+    "timing": null
+  },
+  "evidence_grade": "fixture",
+  "raw_artifacts": [
+    {
+      "path": "configs/firmware-contract/fixtures/mvp10.2-channel-fixture.ndjson",
+      "sha256": "6bea483b9f01dfd474cab7ba89bea6f596a54f7c1f7c43fce5cea21cc4442768"
+    }
+  ],
+  "trials": [
+    {
+      "trial_id": "trial-001",
+      "case_id": "channel-profile-001",
+      "warmup": false,
+      "status": "succeeded",
+      "duration_us": 12,
+      "failure_reason": "",
+      "channel": {
+        "profile_id": "source_led/project_native_variable",
+        "channel_rate_bps": 9600,
+        "payload_bytes": 16,
+        "overhead_bytes": 8,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames_lost": 0
+      },
+      "timing": null
+    },
+    {
+      "trial_id": "trial-002",
+      "case_id": "channel-profile-001",
+      "warmup": false,
+      "status": "succeeded",
+      "duration_us": 18,
+      "failure_reason": "",
+      "channel": {
+        "profile_id": "source_led/project_native_variable",
+        "channel_rate_bps": 9600,
+        "payload_bytes": 16,
+        "overhead_bytes": 8,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames_lost": 0
+      },
+      "timing": null
+    },
+    {
+      "trial_id": "warmup-001",
+      "case_id": "channel-profile-001",
+      "warmup": true,
+      "status": "succeeded",
+      "duration_us": 9,
+      "failure_reason": "",
+      "channel": {
+        "profile_id": "source_led/project_native_variable",
+        "channel_rate_bps": 9600,
+        "payload_bytes": 16,
+        "overhead_bytes": 8,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames_lost": 0
+      },
+      "timing": null
+    }
+  ],
+  "summary": {
+    "attempted_sample_count": 2,
+    "successful_sample_count": 2,
+    "failed_sample_count": 0,
+    "warmup_count": 1,
+    "p50_us": 12,
+    "p95_us": 18,
+    "max_us": 18,
+    "failure_reasons": [],
+    "channel": {
+      "payload_bytes": 32,
+      "overhead_bytes": 16,
+      "bit_errors": 0,
+      "frame_errors": 0,
+      "frames_lost": 0
+    },
+    "timing": null
+  },
+  "verdict": "not_evaluated",
+  "no_pass_reasons": [
+    "not_bench_measured",
+    "unknown_clock"
+  ],
+  "safety": {
+    "gate_pass_claim": false,
+    "hardware_claim_allowed": false,
+    "rf_synchronization_claim": false,
+    "field_tx_ready": false,
+    "firmware_write_allowed": false
+  }
+}

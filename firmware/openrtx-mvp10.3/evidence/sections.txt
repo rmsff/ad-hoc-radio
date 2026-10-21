@@ -1,0 +1,20 @@
+build_mvp10_3/openrtx_mduv3x0  :
+section              size        addr
+.text              236016   134266880
+.ARM.exidx              8   134502896
+.data                1720   268435456
+.bss2               40960   536871424
+.bss                15200   268437176
+.debug_info       2540669           0
+.debug_abbrev      213742           0
+.debug_loc         368736           0
+.debug_aranges      14896           0
+.debug_ranges       40560           0
+.debug_line        387191           0
+.debug_str         291538           0
+.comment               17           0
+.ARM.attributes        50           0
+.debug_frame        42992           0
+Total             4194295
+
+

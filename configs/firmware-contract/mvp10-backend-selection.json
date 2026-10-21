@@ -1,0 +1,260 @@
+{
+  "schema_version": "adhr-backend-selection-v1",
+  "story_id": "MVP-10.1",
+  "handoff_contract_version": "adhr-sim-fw-contract-v1",
+  "handoff_contract_sha256": "d97a01b0160fe2c125574ffc1c1125a9da20c2d20e0508d35d565977d38ec39a",
+  "scope": "receive_only_firmware_slice",
+  "outcome": "selected",
+  "selected_candidate_id": "openrtx_mduv3x0",
+  "candidates": [
+    {
+      "candidate_id": "opengd77_mduv380",
+      "firmware_base": "OpenGD77 MDUV380_DM1701 R20260131",
+      "source_ref": "https://www.opengd77.com/downloads/releases/MDUV380_DM1701/R20260131/sources_and_tools/OpenGD77_MDUV380_DM1701_20260130.zip@97764b2cfe6ade4e6ecbbadcfa6dc8b62209e391ac0d05748a807b5031354aa9",
+      "target": "MDUV380_firmware",
+      "decision": "deferred",
+      "checks": [
+        {
+          "name": "build_reproducibility",
+          "status": "deferred",
+          "evidence_grade": "source_reviewed",
+          "reason": "The exact target archive is pinned and inspected, but its target build and donor codec preparation have not been reproduced.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        },
+        {
+          "name": "codec_coupling",
+          "status": "deferred",
+          "evidence_grade": "source_reviewed",
+          "reason": "Target source contains dmr_codec, codec_bin, and codec_cleaner paths; no donor-independent ADHR voice or relay path is proven.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        },
+        {
+          "name": "custom_adhr_receive_path",
+          "status": "deferred",
+          "evidence_grade": "source_reviewed",
+          "reason": "No accepted custom ADHR receive/control boundary was identified in the target-current source; the visible paths remain FM, DMR, and hotspot oriented.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        },
+        {
+          "name": "hardware_evidence_boundary",
+          "status": "passed",
+          "evidence_grade": "source_reviewed",
+          "reason": "The source intake explicitly makes no hardware, RF synchronization, compatibility, or field transmit claim.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/016-opengd77-feasibility-spike.md",
+              "sha256": "4d4c4c7e585699f07b3b6ed6f90b58d6646f4c3d921f7af9e90f37fc2a15e29c"
+            }
+          ]
+        },
+        {
+          "name": "license_allowed_use",
+          "status": "deferred",
+          "evidence_grade": "source_reviewed",
+          "reason": "The target archive license permits source review but forbids commercial use and use in projects that allow commercial use; broader project allowed-use remains unresolved.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/016-opengd77-feasibility-spike.md",
+              "sha256": "4d4c4c7e585699f07b3b6ed6f90b58d6646f4c3d921f7af9e90f37fc2a15e29c"
+            },
+            {
+              "path": "docs/research/020-backend-candidate-selection.md",
+              "sha256": "18f945417bde7c69e35472436e590bd23e4f0990a8dffbac8badcad588b1218d"
+            }
+          ]
+        },
+        {
+          "name": "rollback_inputs",
+          "status": "deferred",
+          "evidence_grade": "source_reviewed",
+          "reason": "Generic OpenGD77 backup guidance exists, but no accepted OpenGD77-derived ADHR rollback package has been produced for this project.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        },
+        {
+          "name": "source_pin",
+          "status": "passed",
+          "evidence_grade": "source_reviewed",
+          "reason": "Official target-family source archive R20260131 is downloaded, checksummed, and inspected.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        },
+        {
+          "name": "target_support",
+          "status": "passed",
+          "evidence_grade": "source_reviewed",
+          "reason": "The official archive contains the MDUV380 firmware target family and relevant low-level target source.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        }
+      ],
+      "dmr_compatible": false,
+      "compatibility_claim": false,
+      "ambe_dependency": false,
+      "hardware_claim_allowed": false,
+      "field_tx_ready": false
+    },
+    {
+      "candidate_id": "openrtx_mduv3x0",
+      "firmware_base": "OpenRTX v0.4.4",
+      "source_ref": "https://github.com/OpenRTX/OpenRTX.git@801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+      "target": "mduv3x0",
+      "decision": "selected_receive_only",
+      "checks": [
+        {
+          "name": "build_reproducibility",
+          "status": "passed",
+          "evidence_grade": "build_verified",
+          "reason": "The pinned mduv3x0 target builds in the isolated Docker and Miosix GCC environment, and an earlier receive-only patch build records exact binary and map hashes.",
+          "artifact_refs": [
+            {
+              "path": "configs/firmware-contract/openrtx-mduv3x0-adhr-rxonly-build.json",
+              "sha256": "99eb77611c6ebff2d2065485017b7bbe6faaa28711b61ba3191d2425c8b26fba"
+            },
+            {
+              "path": "docs/research/019-openrtx-isolated-build-and-resource-budget.md",
+              "sha256": "c556e2c5bf80c35b38a7f746b89a717cff5b873200ee4137349ffdaa2565f183"
+            }
+          ]
+        },
+        {
+          "name": "codec_coupling",
+          "status": "deferred",
+          "evidence_grade": "source_reviewed",
+          "reason": "The baseline target links Codec2 and M17 code; MVP-10.3 must prove that its receive-only ADHR boundary does not call codec behavior before this check can pass broadly.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/020-backend-candidate-selection.md",
+              "sha256": "18f945417bde7c69e35472436e590bd23e4f0990a8dffbac8badcad588b1218d"
+            }
+          ]
+        },
+        {
+          "name": "custom_adhr_receive_path",
+          "status": "passed",
+          "evidence_grade": "build_verified",
+          "reason": "A dedicated TX-disabled USB CDC command and receive-observation path is already built and normal-mode verified; contract-v1 frame delivery remains explicit MVP-10.3 scope.",
+          "artifact_refs": [
+            {
+              "path": "configs/firmware-contract/openrtx-mduv3x0-adhr-telemetry-build-20260708.json",
+              "sha256": "1bc0a0a486b4ad8617bd3b52eff63f40629b2e15fb003f3c55950928abf51d53"
+            },
+            {
+              "path": "docs/research/020-backend-candidate-selection.md",
+              "sha256": "18f945417bde7c69e35472436e590bd23e4f0990a8dffbac8badcad588b1218d"
+            }
+          ]
+        },
+        {
+          "name": "hardware_evidence_boundary",
+          "status": "passed",
+          "evidence_grade": "source_reviewed",
+          "reason": "The selection explicitly separates source, build, and prior receive-only observations from channel, turnaround, timing, RF synchronization, and field claims.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/020-backend-candidate-selection.md",
+              "sha256": "18f945417bde7c69e35472436e590bd23e4f0990a8dffbac8badcad588b1218d"
+            }
+          ]
+        },
+        {
+          "name": "license_allowed_use",
+          "status": "passed",
+          "evidence_grade": "source_reviewed",
+          "reason": "GPL-3.0-or-later OpenRTX paths permit the current local source review, modification, and research build; distribution remains subject to GPL and mixed-component obligations and separate review.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/020-backend-candidate-selection.md",
+              "sha256": "18f945417bde7c69e35472436e590bd23e4f0990a8dffbac8badcad588b1218d"
+            }
+          ]
+        },
+        {
+          "name": "rollback_inputs",
+          "status": "passed",
+          "evidence_grade": "source_reviewed",
+          "reason": "A checked-in manifest pins repeated intake codeplug backups, a same-family official D219.74 recovery image and successful write log, and post-recovery factory codeplug evidence. Exact D219.043 MCU and calibration round trips remain explicitly unproven until MVP-10.4.",
+          "artifact_refs": [
+            {
+              "path": "configs/firmware-contract/md-uv380-rollback-inputs-20260712.json",
+              "sha256": "d3f3bffee629cc67c6de5038a52fe2ed539e7143e4dfd0ec752080c43f89f03a"
+            },
+            {
+              "path": "docs/research/020-backend-candidate-selection.md",
+              "sha256": "18f945417bde7c69e35472436e590bd23e4f0990a8dffbac8badcad588b1218d"
+            }
+          ]
+        },
+        {
+          "name": "source_pin",
+          "status": "passed",
+          "evidence_grade": "source_reviewed",
+          "reason": "Official v0.4.4 still resolves to commit 801fc8dd313eb3ac6f83fd4d3b63ed895effdd56 and the relevant source paths are content-hashed.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/018-openrtx-source-build-intake.md",
+              "sha256": "7749eba3b4f6575c8b7d8cc7dfe710988a034b984c863c1be6676b47ec9299d8"
+            },
+            {
+              "path": "docs/research/020-backend-candidate-selection.md",
+              "sha256": "18f945417bde7c69e35472436e590bd23e4f0990a8dffbac8badcad588b1218d"
+            }
+          ]
+        },
+        {
+          "name": "target_support",
+          "status": "passed",
+          "evidence_grade": "source_reviewed",
+          "reason": "OpenRTX v0.4.4 provides the mduv3x0 Meson target, MD-UV3x0 platform files, radio hooks, and USB-capable platform integration.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/018-openrtx-source-build-intake.md",
+              "sha256": "7749eba3b4f6575c8b7d8cc7dfe710988a034b984c863c1be6676b47ec9299d8"
+            }
+          ]
+        }
+      ],
+      "dmr_compatible": false,
+      "compatibility_claim": false,
+      "ambe_dependency": false,
+      "hardware_claim_allowed": false,
+      "field_tx_ready": false
+    }
+  ],
+  "safety": {
+    "receive_only_default": true,
+    "tx_enabled_by_default": false,
+    "firmware_write_allowed": false,
+    "regulatory_profile_accepted": false,
+    "lab_safety_plan_accepted": false,
+    "hardware_claim_allowed": false,
+    "field_tx_ready": false
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "pack_id": "core_cli_regression",
+  "seed": 42,
+  "cases": [
+    {
+      "case_id": "one_hop_nominal",
+      "command": "run",
+      "input": "../scenarios/one-hop.json",
+      "output": "metrics/one-hop.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "one_hop_direct_duplicate",
+      "command": "run",
+      "input": "../scenarios/one-hop-direct-duplicate.json",
+      "output": "metrics/one-hop-direct-duplicate.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "one_hop_corruption",
+      "command": "run",
+      "input": "../scenarios/one-hop-corruption.json",
+      "output": "metrics/one-hop-corruption.json",
+      "expected_outcome": "fail"
+    },
+    {
+      "case_id": "two_hop_short_source",
+      "command": "run",
+      "input": "../scenarios/two-hop-short-source.json",
+      "output": "metrics/two-hop-short-source.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "relay_tree_direct",
+      "command": "run",
+      "input": "../scenarios/relay-tree/direct.json",
+      "output": "metrics/relay-tree-direct.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "relay_tree_one_relay",
+      "command": "run",
+      "input": "../scenarios/relay-tree/one-relay.json",
+      "output": "metrics/relay-tree-one-relay.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "relay_tree_two_relay",
+      "command": "run",
+      "input": "../scenarios/relay-tree/two-relay.json",
+      "output": "metrics/relay-tree-two-relay.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "relay_tree_three_relay_exception",
+      "command": "run",
+      "input": "../scenarios/relay-tree/three-relay-exception.json",
+      "output": "metrics/relay-tree-three-relay-exception.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "relay_tree_branch_narrow",
+      "command": "run",
+      "input": "../scenarios/relay-tree/branch-narrow.json",
+      "output": "metrics/relay-tree-branch-narrow.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "relay_tree_branch_wide",
+      "command": "run",
+      "input": "../scenarios/relay-tree/branch-wide.json",
+      "output": "metrics/relay-tree-branch-wide.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "relay_tree_partition_recovery",
+      "command": "run",
+      "input": "../scenarios/relay-tree/partition-recovery.json",
+      "output": "metrics/relay-tree-partition-recovery.json",
+      "expected_outcome": "pass"
+    },
+    {
+      "case_id": "relay_forward_queue_backpressure",
+      "command": "run",
+      "input": "../scenarios/relay-forward-queue-backpressure.json",
+      "output": "metrics/relay-forward-queue-backpressure.json",
+      "expected_outcome": "fail"
+    },
+    {
+      "case_id": "group_floor_ptt_contention",
+      "command": "ptt-contention",
+      "input": "../scenarios/group-floor-ptt-contention.json",
+      "output": "reports/group-floor-ptt-contention.json",
+      "expected_outcome": "floor_degraded"
+    },
+    {
+      "case_id": "channel_bench_fixture",
+      "command": "calibrate-channel",
+      "input": "../bench/channel-fixture.json",
+      "output": "reports/channel-fixture.json",
+      "expected_outcome": "channel_fixture_only"
+    },
+    {
+      "case_id": "tyt_turnaround_fixture",
+      "command": "calibrate-tyt",
+      "input": "../measurements/tyt-md-uv380-fixture.json",
+      "output": "reports/tyt-turnaround-fixture.json",
+      "expected_outcome": "primary_24ms_viable"
+    },
+    {
+      "case_id": "audio_fixture",
+      "command": "score-audio",
+      "input": "../bench/audio-fixture.json",
+      "output": "reports/audio-fixture.json",
+      "expected_outcome": "good_voice_pass"
+    },
+    {
+      "case_id": "hardware_readiness_fixture",
+      "command": "hardware-readiness",
+      "inputs": {
+        "channel": "reports/channel-fixture.json",
+        "turnaround": "reports/tyt-turnaround-fixture.json",
+        "audio": "reports/audio-fixture.json"
+      },
+      "output": "reports/hardware-readiness.json",
+      "expected_outcome": "hardware_readiness_blocked"
+    }
+  ]
+}

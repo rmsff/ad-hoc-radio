@@ -1,0 +1,28 @@
+{
+  "scenario_id": "scheduled_relay_tree_one_relay",
+  "seed": 42,
+  "frame_count": 3,
+  "start_ms": 1000,
+  "net_id": 1,
+  "group_id": 100,
+  "source_station_id": 1,
+  "call_id": 9002,
+  "schedule": {"schedule_id": 101, "schedule_authority_id": 1, "timing_strategy": "source_led", "timing_epoch_id": 9002, "timing_authority_id": 1},
+  "initial_plan": {
+    "snapshot": {"id": 10, "observed_at_ms": 900, "freshness_ms": 1000, "member_ids": [2]},
+    "graph": {
+      "epoch": 8,
+      "freshness_ms": 1000,
+      "links": [
+        {"from_station_id": 1, "to_station_id": 10, "enabled": true, "quality": 0.9, "loss": 0.01, "delay_ms": 1, "observed_at_ms": 900},
+        {"from_station_id": 10, "to_station_id": 2, "enabled": true, "quality": 0.9, "loss": 0.01, "delay_ms": 1, "observed_at_ms": 900}
+      ]
+    },
+    "constraints": {"planning_at_ms": 1000, "max_relay_depth": 3, "max_playout_latency_ms": 250, "max_voice_airtime_pct": 100, "require_all_expected_members": true, "min_relay_battery_fraction": 0, "min_link_quality": 0, "max_link_loss": 1},
+    "cost_model": {"source_opportunity_ms": 10, "relay_opportunity_ms": 10, "guard_after_ms": 1, "frame_period_ms": 80},
+    "search_limits": {"max_paths_per_member": 20, "max_tree_candidates": 200, "max_feasible_trees": 200},
+    "relay_states": [{"station_id": 10, "relay_capable": true, "relay_enabled": true, "busy": false, "battery_fraction": 0.9}]
+  },
+  "runtime": {"opportunity_profile": {"source_duration_ms": 10, "relay_duration_ms": 10, "guard_after_ms": 1, "max_cycle_ms": 80}, "forward_queue_max_depth": 64, "missed_parent_threshold": 2, "allow_cycle_timing_stress": false},
+  "replans": []
+}

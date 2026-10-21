@@ -1,0 +1,2 @@
+   text	   data	    bss	    dec	    hex	filename
+ 236024	   1720	  56160	 293904	  47c10	build_mvp10_3/openrtx_mduv3x0

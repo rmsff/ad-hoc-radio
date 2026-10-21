@@ -1,0 +1,144 @@
+{
+  "schema_version": "adhr-opengd77-l2-envelope-v1",
+  "story_id": "MVP-10.5",
+  "evidence_grade": "host_fixture_only",
+  "layout": {
+    "wire_size": 27,
+    "short_frame_size": 22,
+    "discriminator": 167,
+    "version": 1,
+    "payload_length": 22,
+    "reserved": 0,
+    "crc": {
+      "name": "CRC-8/ATM",
+      "polynomial": 7,
+      "initial": 0,
+      "xorout": 0,
+      "reflected": false,
+      "coverage": "bytes[0:4] || bytes[5:27]"
+    }
+  },
+  "ownership": {
+    "transport_crc8": "opengd77_l2_envelope",
+    "short_frame_crc32": "canonical_adhr_short_voice",
+    "fec_framing_sync": "hr_c6000_layer2_candidate",
+    "identity_routing_scheduling_metrics": "canonical_adhr_core"
+  },
+  "short_frame_context": {
+    "net_id": 1,
+    "source_id": 10,
+    "group_id": 7,
+    "call_id": 36865,
+    "base_seq": 40,
+    "base_created_at_ms": 1000000,
+    "frame_period_ms": 80
+  },
+  "positive": {
+    "name": "valid_source_voice",
+    "mode": "adhr",
+    "input_hex": "a7011600fc011000020314cbf0b66eb710f7eb1020304050607080",
+    "short_frame_hex": "011000020314cbf0b66eb710f7eb1020304050607080",
+    "expected_reason": "accepted",
+    "consumed": true,
+    "event_queued": true
+  },
+  "negative": [
+    {
+      "name": "wrong_mode",
+      "mode": "analog_fm",
+      "input_hex": "a7011600fc011000020314cbf0b66eb710f7eb1020304050607080",
+      "expected_reason": "wrong_mode",
+      "consumed": false
+    },
+    {
+      "name": "wrong_discriminator",
+      "mode": "adhr",
+      "input_hex": "00011600fc011000020314cbf0b66eb710f7eb1020304050607080",
+      "expected_reason": "wrong_discriminator",
+      "consumed": true
+    },
+    {
+      "name": "wrong_version",
+      "mode": "adhr",
+      "input_hex": "a7021600fc011000020314cbf0b66eb710f7eb1020304050607080",
+      "expected_reason": "wrong_version",
+      "consumed": true
+    },
+    {
+      "name": "wrong_length",
+      "mode": "adhr",
+      "input_hex": "a7011500fc011000020314cbf0b66eb710f7eb1020304050607080",
+      "expected_reason": "wrong_length",
+      "consumed": true
+    },
+    {
+      "name": "reserved_nonzero",
+      "mode": "adhr",
+      "input_hex": "a7011601fc011000020314cbf0b66eb710f7eb1020304050607080",
+      "expected_reason": "reserved",
+      "consumed": true
+    },
+    {
+      "name": "integrity",
+      "mode": "adhr",
+      "input_hex": "a7011600fd011000020314cbf0b66eb710f7eb1020304050607080",
+      "expected_reason": "integrity",
+      "consumed": true
+    },
+    {
+      "name": "truncated",
+      "mode": "adhr",
+      "input_hex": "a7011600fc011000020314cbf0b66eb710f7eb10203040506070",
+      "expected_reason": "truncated",
+      "consumed": true
+    },
+    {
+      "name": "oversize",
+      "mode": "adhr",
+      "input_hex": "a7011600fc011000020314cbf0b66eb710f7eb102030405060708000",
+      "expected_reason": "oversize",
+      "consumed": true
+    }
+  ],
+  "state_cases": [
+    {
+      "name": "queue_pressure",
+      "reason": "queue_pressure",
+      "queue_capacity": 4,
+      "event_queued": false,
+      "overwrites_existing": false
+    },
+    {
+      "name": "timeout",
+      "reason": "timeout",
+      "clears_stale_queue": true,
+      "event_queued": true
+    },
+    {
+      "name": "reset",
+      "reason": "reset",
+      "clears_stale_queue": true,
+      "event_queued": true
+    },
+    {
+      "name": "disconnect",
+      "reason": "disconnect",
+      "clears_stale_queue": true,
+      "event_queued": true
+    }
+  ],
+  "event": {
+    "schema_version": 1,
+    "wire_size": 34,
+    "queue_capacity": 4,
+    "byte_order": "big_endian",
+    "payload_copy": "defensive"
+  },
+  "claims": {
+    "rf_frame_received": false,
+    "dmr_interoperability": false,
+    "hardware_ready": false,
+    "firmware_write_allowed": false,
+    "field_tx_ready": false
+  }
+}

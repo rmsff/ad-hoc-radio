@@ -1,0 +1,144 @@
+{
+  "artifact_id": "openrtx-mduv3x0-adhr-telemetry-build-20260708",
+  "status": "firmware_written_normal_boot_telemetry_verified",
+  "measured_at": "2026-07-08",
+  "source": {
+    "repo": "https://github.com/OpenRTX/OpenRTX.git",
+    "tag": "v0.4.4",
+    "commit": "801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+    "local_checkout": "/tmp/adhr-openrtx-isolated/OpenRTX",
+    "build_dir": "/tmp/adhr-openrtx-isolated/OpenRTX/build_cm4_adhr_telemetry"
+  },
+  "target": {
+    "radio_family": "TYT MD-UV380 / MD-UV3x0",
+    "openrtx_target": "mduv3x0",
+    "miosix_cross_file": "cross_cm4.txt"
+  },
+  "patch": {
+    "local_patch": ".artifacts/openrtx-adhr-telemetry-20260708/adhr-bench-usb-telemetry.patch",
+    "sha256": "e102b6e6d50b48802275d567b0c0dc9523fc82a5f8d688986c74106d0a3e3227",
+    "features": [
+      "CONFIG_ADHR_BENCH_RX_ONLY remains enabled",
+      "radio_enableTx compiles to immediate return",
+      "USB CDC telemetry is opt-in via ADHR START",
+      "ADHR STOP disables telemetry",
+      "ADHR PING returns ADHR OK PONG v1",
+      "telemetry emits rate-limited ADHR RX lines with sequence, mode, status, bandwidth, RX/TX frequencies, RSSI, SQL, squelch-open, tone-enable, and txDisable"
+    ]
+  },
+  "artifacts": {
+    "elf": {
+      "path": ".artifacts/openrtx-adhr-telemetry-20260708/openrtx_mduv3x0_adhr_telemetry.elf",
+      "sha256": "41d40dc75eaf36c6317c2bafc657fda1219164d9ca858d46dedae28ec190298e"
+    },
+    "raw_bin": {
+      "path": ".artifacts/openrtx-adhr-telemetry-20260708/openrtx_mduv3x0_adhr_telemetry_bin",
+      "bytes": 235192,
+      "sha256": "4b204484783ba1660bf0275030d1b6d110a2f5dfcae0ae66c7de42efc069b748"
+    },
+    "wrapped_firmware": {
+      "path": ".artifacts/openrtx-adhr-telemetry-20260708/openrtx_mduv3x0_adhr_telemetry_wrap",
+      "bytes": 235704,
+      "sha256": "8eda5a79619c2c79295a6a58def0d27c95f43d91348579a9e593960a6205c4a0"
+    },
+    "map": {
+      "path": ".artifacts/openrtx-adhr-telemetry-20260708/openrtx_mduv3x0_adhr_telemetry.map",
+      "sha256": "c0d3a4ebf94bafad8a1c9353253467688b65070d346709558ad776659146f2f6"
+    }
+  },
+  "flash_write": {
+    "performed_at": "2026-07-08",
+    "host": "NanoPi FriendlyWrt 23.05.5",
+    "remote_firmware_path": "/root/adhr-radio/openrtx_mduv3x0_adhr_telemetry_wrap",
+    "remote_firmware_sha256": "8eda5a79619c2c79295a6a58def0d27c95f43d91348579a9e593960a6205c4a0",
+    "pre_write_usb_device": "0483:df11 AnyRoad Technology Digital Radio in USB mode",
+    "command": "/usr/local/bin/radio_tool -d 0 -f -i /root/adhr-radio/openrtx_mduv3x0_adhr_telemetry_wrap",
+    "result": "Done!",
+    "remote_flash_log": "/root/adhr-radio/logs/openrtx-adhr-telemetry-flash-20260708.log",
+    "local_flash_log": ".artifacts/md-uv380-openrtx-telemetry-flash-20260708/openrtx-adhr-telemetry-flash-20260708.log",
+    "flash_log_sha256": "59a950b53e6ec3d84a04261342bdb82957eb3fe0a491e22fb6e911c18c860fe3",
+    "post_write_usb_device": "0483:df11 AnyRoad Technology Digital Radio in USB mode"
+  },
+  "normal_mode_telemetry_check": {
+    "performed_at": "2026-07-08",
+    "usb_device": "0483:5740 STMicroelectronics STM32 Virtual ComPort in FS Mode",
+    "tty_device": "/dev/ttyACM0",
+    "commands_sent": [
+      "ADHR PING",
+      "ADHR START",
+      "ADHR STOP"
+    ],
+    "local_log": ".artifacts/md-uv380-openrtx-telemetry-flash-20260708/adhr-telemetry-normalmode-20260708.log",
+    "log_sha256": "e7bb4f4a66a4bc079d47d9bc6270cafa179b14bf8d5a027338d16ed7aab22c39",
+    "bytes": 124,
+    "observed_lines": [
+      "ADHR OK PONG v1",
+      "ADHR OK START v1",
+      "ADHR RX seq=0 op=2 st=0 bw=0 rx=144425000 tx=144425000 rssi=-137 sql=4 sq=0 tone=0 txdis=1"
+    ],
+    "interpretation": "USB CDC command/telemetry path works. The first captured line reports op=2, so the radio should be switched back to analog FM/NFM before the next receive-event capture."
+  },
+  "receive_event_capture_attempts": [
+    {
+      "performed_at": "2026-07-08",
+      "user_report": "NFM selected after FM caused reboot; previous radio state had been described as hung",
+      "local_log": ".artifacts/md-uv380-openrtx-telemetry-flash-20260708/adhr-telemetry-nfm-ready-long-20260708.log",
+      "log_sha256": "b064dbfee5d4738cd4cf2173ff0cf7274325c3be3b3eab9fe5a5e2ff39e34dec",
+      "observed_lines": [
+        "ADHR OK STOP v1",
+        "ADHR OK START v1",
+        "ADHR RX seq=0 op=2 st=0 bw=0 rx=144425000 tx=144425000 rssi=-137 sql=4 sq=0 tone=0 txdis=1"
+      ],
+      "result": "capture_not_run_against_quansheng",
+      "interpretation": "The telemetry path still works, but the radio state exposed by RTX is op=2/st=0 instead of analog FM/NFM op=1/st=1. Do not use this state for RF receive-event capture."
+    }
+  ],
+  "resource_use": {
+    "elf_text_bytes": 233468,
+    "elf_data_bytes": 1720,
+    "elf_bss_bytes": 53208,
+    "elf_total_dec_bytes": 288396,
+    "flash_used_bytes": 235192,
+    "flash_region_bytes": 868352,
+    "flash_percent": 27.08,
+    "smallram_used_bytes": 13968,
+    "smallram_region_bytes": 65536,
+    "smallram_percent": 21.31,
+    "largeram_used_bytes": 40960,
+    "largeram_region_bytes": 130560,
+    "largeram_percent": 31.37
+  },
+  "symbol_checks": {
+    "radio_enableTx": "08018468 <radio_enableTx>: 4770 bx lr",
+    "adhr_bench_build_marker": "0803ec30 00000016 T adhr_bench_build_marker",
+    "adhrTelemetryEnabled": "100015f9 00000001 b _ZL20adhrTelemetryEnabled"
+  },
+  "firmware_strings": [
+    "ADHR_BENCH_RX_ONLY:v0",
+    "ADHR START",
+    "ADHR OK START v1",
+    "ADHR STOP",
+    "ADHR OK STOP v1",
+    "ADHR PING",
+    "ADHR OK PONG v1",
+    "ADHR RX seq=%lu op=%u st=%u bw=%u rx=%lu tx=%lu rssi=%ld sql=%u sq=%u tone=%u txdis=%u"
+  ],
+  "host_protocol": {
+    "transport": "OpenRTX normal-mode USB CDC /dev/ttyACM0 after flash and reboot",
+    "start_command": "ADHR START\\n",
+    "stop_command": "ADHR STOP\\n",
+    "ping_command": "ADHR PING\\n",
+    "event_line_prefix": "ADHR RX ",
+    "event_example": "ADHR RX seq=0 op=1 st=1 bw=0 rx=433525000 tx=433525000 rssi=-88 sql=8 sq=0 tone=0 txdis=1"
+  },
+  "claim_limits": {
+    "not_flashed": false,
+    "normal_boot_telemetry_verified": true,
+    "hardware_claim_allowed": false,
+    "field_tx_ready": false,
+    "rf_tx_tested": false,
+    "audio_capture": "not implemented",
+    "adhr_frame_rx": "not implemented"
+  },
+  "next_gate": "stabilize_or_force_analog_fm_nfm_state_before_squelch_transition_capture"
+}

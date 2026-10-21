@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lyra V2 3200</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f6f8f8;color:#202b30;font:16px/1.5 system-ui,sans-serif;letter-spacing:0}
+main{max-width:960px;margin:auto;padding:28px 20px}h1{font-size:28px;margin:0 0 8px}h2{font-size:20px;margin:24px 0 8px}
+.row{display:grid;grid-template-columns:140px minmax(0,1fr);align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #d5dfe0}
+audio{width:100%;height:42px}a{color:#146863}footer{margin-top:24px;font-size:14px}p{overflow-wrap:anywhere}
+@media(max-width:560px){.row{grid-template-columns:1fr;gap:4px}main{padding:20px 12px}}
+</style>
+<main>
+<h1>Lyra V2 3200</h1>
+<p>v1.3.2 · 3200 бит/с · 20 мс · без потерь</p>
+<section><h2>ru01</h2>
+<div class="row"><span>Исходник</span><audio controls preload="none" src="ru01-original.wav"></audio></div>
+<div class="row"><span>PCM 8 кГц</span><audio controls preload="none" src="ru01-input8k.wav"></audio></div>
+<div class="row"><span>Lyra</span><audio controls preload="none" src="ru01-padded8k_decoded.wav"></audio></div>
+</section>
+<section><h2>ru02</h2>
+<div class="row"><span>Исходник</span><audio controls preload="none" src="ru02-original.wav"></audio></div>
+<div class="row"><span>PCM 8 кГц</span><audio controls preload="none" src="ru02-input8k.wav"></audio></div>
+<div class="row"><span>Lyra</span><audio controls preload="none" src="ru02-padded8k_decoded.wav"></audio></div>
+</section>
+<footer>
+<p>Оценка разборчивости пользователем ещё не получена. Задержка кодека не измерена; временное выравнивание не применялось. Конец входа дополнен нулями до границы кадра.</p>
+<p><a href="ATTRIBUTION.txt">Источники и лицензии</a> · <a href="probe-receipt.json">Receipt</a> · <a href="packet-trace.json">Packet trace</a></p>
+</footer>
+</main>
+</html>

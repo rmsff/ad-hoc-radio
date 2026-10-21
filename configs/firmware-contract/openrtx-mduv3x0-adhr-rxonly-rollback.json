@@ -1,0 +1,48 @@
+{
+  "schema_version": "adhr-firmware-rollback-package-v1",
+  "story_id": "MVP-10.3",
+  "candidate_id": "openrtx_mduv3x0",
+  "status": "packaged_not_executed",
+  "generated_at": "2026-07-12",
+  "exact_build_output": {
+    "source_commit": "801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+    "target": "mduv3x0",
+    "firmware_bin_sha256": "d1cf3c92afa1bec4c32d9407fb9a149155e8ded85f9d96a9c5d57a2784c2c4aa",
+    "wrapped_firmware_sha256": "31399b78bf65016b9a2a6186dd6cac471c9855a84b252dde84cd1ee7120ffc4e"
+  },
+  "rollback_input_inventory": {
+    "path": "configs/firmware-contract/md-uv380-rollback-inputs-20260712.json",
+    "sha256": "d3f3bffee629cc67c6de5038a52fe2ed539e7143e4dfd0ec752080c43f89f03a",
+    "observed_intake_firmware": "D219.043",
+    "observed_intake_codeplug_version": "V02.37",
+    "same_family_recovery_firmware": "MD-UV380-AES255(REC)-D219.74"
+  },
+  "recovery": {
+    "mode": "TYT firmware update/DFU mode",
+    "procedure_refs": [
+      "docs/hardware/tyt-md-uv380-readback-runbook.md",
+      "docs/hardware/tyt-md-uv380-firmware-entry-plan.md",
+      "docs/firmware/openrtx-md-uv380-bench-entry-plan.md"
+    ],
+    "same_family_stock_write_previously_observed": true,
+    "codeplug_readback_available": true,
+    "execution_story": "MVP-10.4"
+  },
+  "unproven": [
+    "exact D219.043 MCU image availability",
+    "exact intake firmware round trip",
+    "calibration round trip",
+    "end-to-end rollback after this exact build"
+  ],
+  "claims": {
+    "rollback_inputs_available": true,
+    "rollback_package_complete_for_dry_run": true,
+    "rollback_executed_for_this_build": false,
+    "exact_intake_firmware_round_trip_proven": false,
+    "calibration_round_trip_proven": false,
+    "end_to_end_rollback_gate_passed": false,
+    "firmware_write_allowed": false,
+    "hardware_claim_allowed": false,
+    "field_tx_ready": false
+  }
+}

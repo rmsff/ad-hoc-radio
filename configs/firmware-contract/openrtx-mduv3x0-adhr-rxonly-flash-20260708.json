@@ -1,0 +1,144 @@
+{
+  "artifact_id": "openrtx-mduv3x0-adhr-rxonly-flash-20260708",
+  "status": "firmware_written_first_boot_confirmed_rx_observed",
+  "measured_at": "2026-07-08",
+  "radio": {
+    "model": "TYT MD-UV380",
+    "power_class": "5W",
+    "stock_firmware_before_write": "D219.043",
+    "stock_codeplug_version_before_write": "V02.37"
+  },
+  "firmware_artifact": {
+    "nanopi_path": "/root/adhr-radio/openrtx_mduv3x0_adhr_rxonly_wrap",
+    "local_build_path": ".artifacts/openrtx-adhr-rxonly-20260707/openrtx_mduv3x0_adhr_rxonly_wrap",
+    "sha256": "bbbf51dae865ff7e827497635e64f0c7ee1861b8183a0452b926942ca7b507b1",
+    "radio_tool_fw_info": {
+      "family_label": "MD-9600 (UV3X0)",
+      "start_address": "0x0800c000",
+      "length": "0x000361c8"
+    }
+  },
+  "tooling": {
+    "host": "NanoPi FriendlyWrt 23.05.5",
+    "radio_tool_path": "/usr/local/bin/radio_tool",
+    "radio_tool_sha256": "51f0d24f5cbaede37db4e741044168738f05ef3ec438361d24605bc63c9a199c"
+  },
+  "pre_write_gate": {
+    "usb_device": "0483:df11 AnyRoad Technology Digital Radio in USB mode",
+    "radio_tool_index": 0,
+    "radio_tool_info": "TYT MD-UV380",
+    "dfu_alt0": "@Internal Flash /0x0800C000/01*016Kg,01*064Kg,07*128Kg",
+    "dfu_alt1": "@SPI Flash Memory /0x00000000/16*064Kg"
+  },
+  "write": {
+    "command": "/usr/local/bin/radio_tool -d 0 -f -i /root/adhr-radio/openrtx_mduv3x0_adhr_rxonly_wrap",
+    "result": "Done",
+    "flash_log": ".artifacts/md-uv380-openrtx-flash-20260708/openrtx-adhr-rxonly-flash-20260708-164157.log",
+    "flash_log_sha256": "784e0249e2b024ccbf69e558ed7644000e4ae3c4b61c9cb503b318f2990e88e9"
+  },
+  "first_boot": {
+    "confirmed_by_usb": true,
+    "confirmed_by_user_visual": true,
+    "usb_device": "0483:5740 STMicroelectronics STM32 Virtual ComPort in FS Mode",
+    "tty_device": "/dev/ttyACM0",
+    "visual_screen": "screen lit; frequency near 430 MHz shown; signal and volume level indicators visible",
+    "passive_serial_read_seconds": 3,
+    "passive_serial_output": "none",
+    "passive_serial_recheck_seconds": 5,
+    "passive_serial_recheck_output": "none"
+  },
+  "normal_mode_usb_exploration": {
+    "usb_cdc_device": "/dev/ttyACM0",
+    "radio_tool_list_output": "none",
+    "passive_serial_read_seconds": 3,
+    "passive_serial_output": "none",
+    "source_evidence": "OpenRTX vcom is used by XMODEM external-flash backup/restore and M17 demodulator logging; no stock text shell or live host-control command protocol found",
+    "host_control_ready": false,
+    "xmodem_backup_possible_from_radio_ui": true
+  },
+  "ui_photo_evidence": {
+    "source_files": [
+      "a label photo (not published)",
+      "a label photo (not published)",
+      "a label photo (not published)",
+      "a label photo (not published)"
+    ],
+    "converted_review_copies": "/tmp/adhr-radio-ui-photos/*.png",
+    "screens_observed": [
+      "Info",
+      "About"
+    ],
+    "info_screen_observations": [
+      "battery voltage about 7.44V visible",
+      "RSSI about -88dBm visible",
+      "band capability VHF+UHF visible",
+      "VHF range 136-174 and UHF range 400-480 visible"
+    ],
+    "about_screen_observations": [
+      "OpenRTX about/credits screen visible"
+    ],
+    "backup_restore_visible": false
+  },
+  "xmodem_backup_probe": {
+    "receiver_source": "tools/xmodem-rx/xmodem_rx.c",
+    "nanopi_binary": "/tmp/adhr_xmodem_rx",
+    "nanopi_binary_sha256": "433053122ed06622b65e59354b05153656ec68d27705c75a22805086274e8711",
+    "attempt_result": "timeout_waiting_for_radio_backup_start",
+    "bytes_received": 0,
+    "zero_byte_temp_file_removed": true,
+    "source_findings": "Backup/Restore screens exist in OpenRTX default UI code but are not present in the main menu_items array for the built UI; the backup screen would require PTT to start transfer if reached",
+    "interpretation": "host receiver is ready, but the current flashed UI does not expose a safe reachable Backup menu path"
+  },
+  "receive_only_observations": [
+    {
+      "observed_at": "2026-07-08",
+      "frequency_mhz": 144.425,
+      "source_radio": "Quansheng UV-K5 V2 F4HWN custom scrambler build",
+      "source_mode": "analog FM, user-operated test transmission",
+      "receiver": "TYT MD-UV380 running OpenRTX ADHR receive-only patch",
+      "receiver_screen_mode": "M17 #ALL",
+      "result": "RSSI/signal strength rises sharply on Quansheng transmission, but green RX/audio/speaker does not open",
+      "conclusion": "RF receive/tuning sees the carrier; audio does not open because receiver is in M17 digital mode while source is analog FM. Switch TYT to FM/NFM before repeating."
+    },
+    {
+      "observed_at": "2026-07-08",
+      "frequency_mhz": 144.425,
+      "source_radio": "Quansheng UV-K5 V2 F4HWN custom scrambler build",
+      "source_mode": "analog FM, user-operated test transmission",
+      "receiver": "TYT MD-UV380 running OpenRTX ADHR receive-only patch",
+      "receiver_screen_mode": "NFM",
+      "result": "user reports same no-audio behavior, but green RX indicator/button stays on continuously",
+      "conclusion": "NFM mode is selected, but squelch is likely held open by too-low SQL/noise/RSSI threshold; raise SQL until green is off with no signal, then repeat Quansheng carrier test"
+    },
+    {
+      "observed_at": "2026-07-08",
+      "frequency_mhz": 144.425,
+      "source_radio": "Quansheng UV-K5 V2 F4HWN custom scrambler build",
+      "source_mode": "analog FM/NFM, short user-operated test transmission",
+      "receiver": "TYT MD-UV380 running OpenRTX ADHR receive-only patch",
+      "receiver_screen_mode": "NFM",
+      "receiver_settings": "CTCSS disabled; SQL raised until RX indicator is closed with no signal",
+      "result": "user reports Quansheng transmission opens the TYT speaker/audio path",
+      "conclusion": "VHF analog NFM receive path is confirmed on the flashed receive-only OpenRTX build. Earlier no-audio behavior was settings-related, not a cable or RF-front-end failure."
+    },
+    {
+      "observed_at": "2026-07-08",
+      "frequency_mhz": 433.525,
+      "source_radio": "Quansheng UV-K5 V2 F4HWN custom scrambler build",
+      "source_mode": "CH3 PVT-U1 analog NFM, scrambler off, short user-operated test transmission",
+      "receiver": "TYT MD-UV380 running OpenRTX ADHR receive-only patch",
+      "receiver_screen_mode": "NFM",
+      "receiver_settings": "CTCSS disabled; SQL not held open by background noise",
+      "result": "user reports the UHF receive test works",
+      "conclusion": "UHF analog NFM receive path is also confirmed for the current Quansheng/TYT bench pair. This is receive-only evidence and does not validate TYT transmit."
+    }
+  ],
+  "claim_limits": {
+    "hardware_claim_allowed": false,
+    "field_tx_ready": false,
+    "ptt_tested": false,
+    "rf_tx_tested": false,
+    "authorized_over_the_air_transmission": false
+  },
+  "next_gate": "receive_only_bench_capture_and_host_event_strategy"
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "artifact_type": "audio_bench_log_template",
+  "status": "template_only",
+  "hardware_claim_allowed": false,
+  "field_tx_ready": false,
+  "target_radio_family": "TYT MD-UV380 / MD-UV3x0 class",
+  "operator": "TBD",
+  "captured_at_utc": "TBD",
+  "lab_setup_ref": "TBD",
+  "convert_to": "configs/bench/audio-<date>.json",
+  "fixture_or_capture_id": "TBD",
+  "fixture_or_capture_path": "TBD",
+  "artifact_sha256": "TBD",
+  "evidence_grade": "TBD",
+  "codec_class": "TBD",
+  "audio_bandwidth_hz": 8000,
+  "scoring_method": "TBD",
+  "good_voice_threshold": 75,
+  "noise_profiles": [],
+  "loss_profiles": [],
+  "notes": "Use for audio or codec bench capture notes before conversion to score-audio input. Template only; not an adhr-sim input."
+}

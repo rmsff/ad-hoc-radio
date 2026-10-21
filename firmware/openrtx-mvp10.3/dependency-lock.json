@@ -1,0 +1,27 @@
+{
+  "schema_version": "adhr-openrtx-dependency-lock-v1",
+  "openrtx_commit": "801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+  "dependencies": [
+    {
+      "name": "codec2",
+      "repo": "https://github.com/drowe67/codec2-dev",
+      "commit": "a298f3789d7ef9e829049ebe14da8845d97ba8c1",
+      "content_sha256": "c1ad820af8063ee2b638c44c4312a8739b1fe629067326b09c709ce1ce4411ed",
+      "package_overlay": "subprojects/packagefiles/codec2"
+    },
+    {
+      "name": "XPowersLib",
+      "repo": "https://github.com/lewisxhe/XPowersLib.git",
+      "commit": "b0ed896c17d49a1b823ba0a6323cafd89b3a7d91",
+      "content_sha256": "81e3c526eb0d39e7f7fd3d117924020a1d54ac494f78267c663e0f11cd286eea",
+      "package_overlay": "subprojects/packagefiles/XPowersLib"
+    },
+    {
+      "name": "radio_tool",
+      "repo": "https://github.com/v0l/radio_tool",
+      "commit": "6fe15235814a69a0b43f840935000dd5642aa2f4",
+      "content_sha256": "04403bf468a6f7105b52167c8830fd1215b3ad262d9792931136f57c68016963",
+      "package_overlay": "subprojects/packagefiles/radio_tool"
+    }
+  ]
+}

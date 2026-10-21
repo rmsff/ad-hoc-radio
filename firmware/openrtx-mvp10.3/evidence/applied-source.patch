@@ -1,0 +1,945 @@
+diff --git a/meson.build b/meson.build
+index 2d9ec6f..94ace8b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -411,7 +411,10 @@ mduv3x0_src = ['platform/drivers/CPS/cps_io_native_MDUV3x0.c',
+                'platform/drivers/audio/Cx000_dac.cpp',
+                'platform/drivers/baseband/radio_UV3x0.cpp',
+                'platform/drivers/baseband/AT1846S_UV3x0.cpp',
+-               'platform/drivers/baseband/HR_C6000_UV3x0.cpp']
++               'platform/drivers/baseband/HR_C6000_UV3x0.cpp',
++               'openrtx/src/rtx/adhr_rxonly.c',
++               'openrtx/src/rtx/adhr_tx_queue.c',
++               'openrtx/src/rtx/adhr_usb_rxonly.c']
+ 
+ mduv3x0_inc = ['platform/targets/MD-UV3x0']
+ mduv3x0_def =  {'PLATFORM_MDUV3x0': '', 'timegm': 'mktime'}
+diff --git a/openrtx/include/rtx/adhr_rxonly.h b/openrtx/include/rtx/adhr_rxonly.h
+new file mode 100644
+index 0000000..88d5673
+--- /dev/null
++++ b/openrtx/include/rtx/adhr_rxonly.h
+@@ -0,0 +1,52 @@
++/*
++ * SPDX-FileCopyrightText: Copyright 2026 Ad Hoc Radio Contributors
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ */
++
++#ifndef ADHR_RXONLY_H
++#define ADHR_RXONLY_H
++
++#include <stdbool.h>
++#include <stddef.h>
++#include <stdint.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#define ADHR_RXONLY_MAX_LINE 384
++#define ADHR_RXONLY_MAX_OUTPUT 512
++#define ADHR_RXONLY_MAX_FRAME_BYTES 128
++#define ADHR_RXONLY_COMMAND_TIMEOUT_MS 1000
++
++typedef void (*adhr_rxonly_emit_fn)(const char *line, size_t length,
++                                    void *user);
++
++typedef struct
++{
++    char line[ADHR_RXONLY_MAX_LINE];
++    char output[ADHR_RXONLY_MAX_OUTPUT];
++    size_t line_length;
++    uint64_t partial_started_ms;
++    uint32_t observation_sequence;
++    uint32_t reset_generation;
++    bool discarding_overflow;
++    adhr_rxonly_emit_fn emit;
++    void *emit_user;
++} adhr_rxonly_context_t;
++
++void adhr_rxonly_init(adhr_rxonly_context_t *context,
++                      adhr_rxonly_emit_fn emit, void *user);
++
++void adhr_rxonly_feed(adhr_rxonly_context_t *context, const uint8_t *data,
++                      size_t length, uint64_t monotonic_ms);
++
++void adhr_rxonly_poll(adhr_rxonly_context_t *context,
++                      uint64_t monotonic_ms);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* ADHR_RXONLY_H */
+diff --git a/openrtx/include/rtx/adhr_tx_queue.h b/openrtx/include/rtx/adhr_tx_queue.h
+new file mode 100644
+index 0000000..8c8ae6e
+--- /dev/null
++++ b/openrtx/include/rtx/adhr_tx_queue.h
+@@ -0,0 +1,50 @@
++/*
++ * SPDX-FileCopyrightText: Copyright 2026 Ad Hoc Radio Contributors
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ */
++
++#ifndef ADHR_TX_QUEUE_H
++#define ADHR_TX_QUEUE_H
++
++#include "rtx/adhr_rxonly.h"
++
++#include <stdbool.h>
++#include <stddef.h>
++#include <stdint.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#define ADHR_TX_QUEUE_CAPACITY 4
++
++typedef struct
++{
++    char data[ADHR_TX_QUEUE_CAPACITY][ADHR_RXONLY_MAX_OUTPUT];
++    uint16_t lengths[ADHR_TX_QUEUE_CAPACITY];
++    uint32_t dropped;
++    uint8_t head;
++    uint8_t count;
++} adhr_tx_queue_t;
++
++void adhr_tx_queue_init(adhr_tx_queue_t *queue);
++
++bool adhr_tx_queue_push(adhr_tx_queue_t *queue, const char *data,
++                        size_t length);
++
++const char *adhr_tx_queue_front(const adhr_tx_queue_t *queue);
++
++size_t adhr_tx_queue_front_length(const adhr_tx_queue_t *queue);
++
++void adhr_tx_queue_pop(adhr_tx_queue_t *queue);
++
++uint32_t adhr_tx_queue_dropped(const adhr_tx_queue_t *queue);
++
++void adhr_tx_queue_clear_dropped(adhr_tx_queue_t *queue);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* ADHR_TX_QUEUE_H */
+diff --git a/openrtx/include/rtx/adhr_usb_rxonly.h b/openrtx/include/rtx/adhr_usb_rxonly.h
+new file mode 100644
+index 0000000..c179b75
+--- /dev/null
++++ b/openrtx/include/rtx/adhr_usb_rxonly.h
+@@ -0,0 +1,21 @@
++/*
++ * SPDX-FileCopyrightText: Copyright 2026 Ad Hoc Radio Contributors
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ */
++
++#ifndef ADHR_USB_RXONLY_H
++#define ADHR_USB_RXONLY_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++void adhr_usb_rxonly_init(void);
++void adhr_usb_rxonly_poll(void);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* ADHR_USB_RXONLY_H */
+diff --git a/openrtx/src/rtx/adhr_rxonly.c b/openrtx/src/rtx/adhr_rxonly.c
+new file mode 100644
+index 0000000..600c17f
+--- /dev/null
++++ b/openrtx/src/rtx/adhr_rxonly.c
+@@ -0,0 +1,390 @@
++/*
++ * SPDX-FileCopyrightText: Copyright 2026 Ad Hoc Radio Contributors
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ */
++
++#include "rtx/adhr_rxonly.h"
++
++#include <stdarg.h>
++#include <stdio.h>
++#include <string.h>
++
++static void emit_line(adhr_rxonly_context_t *context, const char *format, ...)
++{
++    va_list args;
++    int length;
++
++    va_start(args, format);
++    length = vsnprintf(context->output, sizeof(context->output), format, args);
++    va_end(args);
++
++    if((length < 0) || ((size_t) length >= sizeof(context->output)))
++    {
++        const char error[] = "ADHR1 ERROR code=internal_overflow\n";
++        memcpy(context->output, error, sizeof(error));
++        length = sizeof(error) - 1;
++    }
++
++    if(context->emit != NULL)
++        context->emit(context->output, (size_t) length, context->emit_user);
++}
++
++static char *next_token(char **cursor)
++{
++    char *start;
++
++    while(**cursor == ' ')
++        (*cursor)++;
++
++    if(**cursor == '\0')
++        return NULL;
++
++    start = *cursor;
++    while((**cursor != '\0') && (**cursor != ' '))
++        (*cursor)++;
++
++    if(**cursor == ' ')
++    {
++        **cursor = '\0';
++        (*cursor)++;
++    }
++
++    return start;
++}
++
++static bool has_no_more_tokens(char *cursor)
++{
++    return next_token(&cursor) == NULL;
++}
++
++static bool valid_id(const char *value)
++{
++    size_t length = 0;
++
++    while(value[length] != '\0')
++    {
++        char c = value[length];
++        bool valid = ((c >= 'a') && (c <= 'z'))
++                  || ((c >= 'A') && (c <= 'Z'))
++                  || ((c >= '0') && (c <= '9'))
++                  || (c == '_') || (c == '-') || (c == '.');
++        if(!valid || (length >= 31))
++            return false;
++        length++;
++    }
++
++    return length > 0;
++}
++
++static bool parse_unsigned(const char *value, uint64_t maximum,
++                           uint64_t *result)
++{
++    uint64_t parsed = 0;
++    size_t i = 0;
++
++    if(value[0] == '\0')
++        return false;
++
++    while(value[i] != '\0')
++    {
++        uint8_t digit;
++        if((value[i] < '0') || (value[i] > '9'))
++            return false;
++        digit = (uint8_t) (value[i] - '0');
++        if(parsed > ((maximum - digit) / 10))
++            return false;
++        parsed = (parsed * 10) + digit;
++        i++;
++    }
++
++    *result = parsed;
++    return true;
++}
++
++static bool parse_signed(const char *value, int32_t minimum, int32_t maximum,
++                         int32_t *result)
++{
++    bool negative = value[0] == '-';
++    uint64_t magnitude;
++    uint64_t limit;
++    const char *digits = negative ? value + 1 : value;
++
++    limit = negative ? (uint64_t) (-(int64_t) minimum) : (uint64_t) maximum;
++    if(!parse_unsigned(digits, limit, &magnitude))
++        return false;
++
++    if(negative)
++        *result = (int32_t) (-(int64_t) magnitude);
++    else
++        *result = (int32_t) magnitude;
++
++    return (*result >= minimum) && (*result <= maximum);
++}
++
++static bool normalize_hex(char *value, size_t *byte_count)
++{
++    size_t length = strlen(value);
++    size_t i;
++
++    if((length == 0) || ((length % 2) != 0)
++       || (length > (ADHR_RXONLY_MAX_FRAME_BYTES * 2)))
++        return false;
++
++    for(i = 0; i < length; i++)
++    {
++        char c = value[i];
++        if((c >= 'A') && (c <= 'F'))
++        {
++            value[i] = (char) (c + ('a' - 'A'));
++            continue;
++        }
++        if(((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')))
++            continue;
++        return false;
++    }
++
++    *byte_count = length / 2;
++    return true;
++}
++
++static void lowercase(char *value)
++{
++    while(*value != '\0')
++    {
++        if((*value >= 'A') && (*value <= 'Z'))
++            *value = (char) (*value + ('a' - 'A'));
++        value++;
++    }
++}
++
++static void malformed(adhr_rxonly_context_t *context, const char *operation)
++{
++    emit_line(context, "ADHR1 ERROR code=malformed_command operation=%s\n",
++              operation);
++}
++
++static void handle_rx(adhr_rxonly_context_t *context, char *cursor,
++                      uint64_t monotonic_ms)
++{
++    char *rssi_text = next_token(&cursor);
++    char *frame = next_token(&cursor);
++    size_t frame_bytes;
++    int32_t rssi;
++
++    if((rssi_text == NULL) || (frame == NULL)
++       || !has_no_more_tokens(cursor)
++       || !parse_signed(rssi_text, -200, 0, &rssi)
++       || !normalize_hex(frame, &frame_bytes))
++    {
++        malformed(context, "rx");
++        return;
++    }
++
++    emit_line(context,
++              "ADHR1 EVENT op=receive_delivery obs_seq=%lu "
++              "monotonic_ms=%llu rssi_dbm=%ld frame_bytes=%s "
++              "frame_size_bytes=%zu\n",
++              (unsigned long) context->observation_sequence++,
++              (unsigned long long) monotonic_ms, (long) rssi, frame,
++              frame_bytes);
++}
++
++static void handle_link(adhr_rxonly_context_t *context, char *cursor,
++                        uint64_t monotonic_ms)
++{
++    char *from = next_token(&cursor);
++    char *to = next_token(&cursor);
++    char *rssi_text = next_token(&cursor);
++    char *loss_text = next_token(&cursor);
++    char *delay_text = next_token(&cursor);
++    int32_t rssi;
++    uint64_t loss;
++    uint64_t delay;
++
++    if((from == NULL) || (to == NULL) || (rssi_text == NULL)
++       || (loss_text == NULL) || (delay_text == NULL)
++       || !has_no_more_tokens(cursor) || !valid_id(from) || !valid_id(to)
++       || !parse_signed(rssi_text, -200, 0, &rssi)
++       || !parse_unsigned(loss_text, 100000, &loss)
++       || !parse_unsigned(delay_text, 60000, &delay))
++    {
++        malformed(context, "link");
++        return;
++    }
++
++    emit_line(context,
++              "ADHR1 EVENT op=link_measurement obs_seq=%lu "
++              "observed_at_ms=%llu from_station_id=%s "
++              "to_station_id=%s rssi_dbm=%ld "
++              "loss_milli_pct=%llu delay_ms=%llu\n",
++              (unsigned long) context->observation_sequence++,
++              (unsigned long long) monotonic_ms, from, to, (long) rssi,
++              (unsigned long long) loss, (unsigned long long) delay);
++}
++
++static void handle_timing(adhr_rxonly_context_t *context, char *cursor,
++                          uint64_t monotonic_ms)
++{
++    char *authority = next_token(&cursor);
++    char *epoch = next_token(&cursor);
++    char *acquisition_text = next_token(&cursor);
++    char *drift_text = next_token(&cursor);
++    uint64_t acquisition;
++    int32_t drift;
++
++    if((authority == NULL) || (epoch == NULL) || (acquisition_text == NULL)
++       || (drift_text == NULL) || !has_no_more_tokens(cursor)
++       || !valid_id(authority) || !valid_id(epoch)
++       || !parse_unsigned(acquisition_text, 60000, &acquisition)
++       || !parse_signed(drift_text, -1000000, 1000000, &drift))
++    {
++        malformed(context, "timing");
++        return;
++    }
++
++    emit_line(context,
++              "ADHR1 EVENT op=timing_observation obs_seq=%lu "
++              "monotonic_ms=%llu timing_authority_id=%s "
++              "timing_epoch_id=%s acquisition_ms=%llu drift_ppm=%ld\n",
++              (unsigned long) context->observation_sequence++,
++              (unsigned long long) monotonic_ms, authority, epoch,
++              (unsigned long long) acquisition, (long) drift);
++}
++
++static void process_line(adhr_rxonly_context_t *context,
++                         uint64_t monotonic_ms)
++{
++    char *cursor = context->line;
++    char *protocol = next_token(&cursor);
++    char *operation = next_token(&cursor);
++
++    if((protocol == NULL) || (strcmp(protocol, "ADHR1") != 0)
++       || (operation == NULL))
++    {
++        malformed(context, "protocol");
++        return;
++    }
++
++    if(strcmp(operation, "PING") == 0)
++    {
++        if(!has_no_more_tokens(cursor))
++            malformed(context, "ping");
++        else
++            emit_line(context, "ADHR1 OK op=ping version=1 rx_only=1\n");
++    }
++    else if(strcmp(operation, "RESET") == 0)
++    {
++        if(!has_no_more_tokens(cursor))
++        {
++            malformed(context, "reset");
++            return;
++        }
++        context->observation_sequence = 0;
++        context->reset_generation++;
++        emit_line(context,
++                  "ADHR1 EVENT op=reset reset_generation=%lu "
++                  "monotonic_ms=%llu next_obs_seq=0\n",
++                  (unsigned long) context->reset_generation,
++                  (unsigned long long) monotonic_ms);
++    }
++    else if(strcmp(operation, "RX") == 0)
++    {
++        handle_rx(context, cursor, monotonic_ms);
++    }
++    else if(strcmp(operation, "LINK") == 0)
++    {
++        handle_link(context, cursor, monotonic_ms);
++    }
++    else if(strcmp(operation, "TIMING") == 0)
++    {
++        handle_timing(context, cursor, monotonic_ms);
++    }
++    else if(strcmp(operation, "SCHEDULED_TX") == 0)
++    {
++        emit_line(context, "ADHR1 ERROR code=unsupported_operation "
++                           "operation=scheduled_transmit\n");
++    }
++    else
++    {
++        lowercase(operation);
++        if(!valid_id(operation))
++            malformed(context, "operation");
++        else
++            emit_line(context, "ADHR1 ERROR code=unknown_operation "
++                               "operation=%s\n", operation);
++    }
++}
++
++void adhr_rxonly_init(adhr_rxonly_context_t *context,
++                      adhr_rxonly_emit_fn emit, void *user)
++{
++    memset(context, 0, sizeof(*context));
++    context->emit = emit;
++    context->emit_user = user;
++}
++
++void adhr_rxonly_feed(adhr_rxonly_context_t *context, const uint8_t *data,
++                      size_t length, uint64_t monotonic_ms)
++{
++    size_t i;
++
++    for(i = 0; i < length; i++)
++    {
++        char c = (char) data[i];
++        if(context->discarding_overflow)
++        {
++            if((c == '\n') || (c == '\r'))
++                context->discarding_overflow = false;
++            continue;
++        }
++
++        if((c == '\n') || (c == '\r'))
++        {
++            if(context->line_length > 0)
++            {
++                context->line[context->line_length] = '\0';
++                process_line(context, monotonic_ms);
++                context->line_length = 0;
++            }
++            continue;
++        }
++
++        if(context->line_length == 0)
++            context->partial_started_ms = monotonic_ms;
++
++        if(context->line_length >= (sizeof(context->line) - 1))
++        {
++            context->line_length = 0;
++            context->discarding_overflow = true;
++            emit_line(context, "ADHR1 ERROR code=line_overflow\n");
++            continue;
++        }
++
++        context->line[context->line_length++] = c;
++    }
++}
++
++void adhr_rxonly_poll(adhr_rxonly_context_t *context, uint64_t monotonic_ms)
++{
++    if(monotonic_ms < context->partial_started_ms)
++        return;
++
++    if(context->discarding_overflow)
++    {
++        if((monotonic_ms - context->partial_started_ms)
++           >= ADHR_RXONLY_COMMAND_TIMEOUT_MS)
++            context->discarding_overflow = false;
++        return;
++    }
++
++    if(context->line_length == 0)
++        return;
++
++    if((monotonic_ms - context->partial_started_ms)
++       < ADHR_RXONLY_COMMAND_TIMEOUT_MS)
++        return;
++
++    context->line_length = 0;
++    emit_line(context, "ADHR1 ERROR code=command_timeout\n");
++}
+diff --git a/openrtx/src/rtx/adhr_tx_queue.c b/openrtx/src/rtx/adhr_tx_queue.c
+new file mode 100644
+index 0000000..8ce5521
+--- /dev/null
++++ b/openrtx/src/rtx/adhr_tx_queue.c
+@@ -0,0 +1,67 @@
++/*
++ * SPDX-FileCopyrightText: Copyright 2026 Ad Hoc Radio Contributors
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ */
++
++#include "rtx/adhr_tx_queue.h"
++
++#include <string.h>
++
++void adhr_tx_queue_init(adhr_tx_queue_t *queue)
++{
++    memset(queue, 0, sizeof(*queue));
++}
++
++bool adhr_tx_queue_push(adhr_tx_queue_t *queue, const char *data,
++                        size_t length)
++{
++    uint8_t slot;
++
++    if((length > ADHR_RXONLY_MAX_OUTPUT)
++       || (queue->count >= ADHR_TX_QUEUE_CAPACITY))
++    {
++        queue->dropped++;
++        return false;
++    }
++
++    slot = (uint8_t) ((queue->head + queue->count)
++                      % ADHR_TX_QUEUE_CAPACITY);
++    memcpy(queue->data[slot], data, length);
++    queue->lengths[slot] = (uint16_t) length;
++    queue->count++;
++    return true;
++}
++
++const char *adhr_tx_queue_front(const adhr_tx_queue_t *queue)
++{
++    if(queue->count == 0)
++        return NULL;
++    return queue->data[queue->head];
++}
++
++size_t adhr_tx_queue_front_length(const adhr_tx_queue_t *queue)
++{
++    if(queue->count == 0)
++        return 0;
++    return queue->lengths[queue->head];
++}
++
++void adhr_tx_queue_pop(adhr_tx_queue_t *queue)
++{
++    if(queue->count == 0)
++        return;
++    queue->head = (uint8_t) ((queue->head + 1)
++                             % ADHR_TX_QUEUE_CAPACITY);
++    queue->count--;
++}
++
++uint32_t adhr_tx_queue_dropped(const adhr_tx_queue_t *queue)
++{
++    return queue->dropped;
++}
++
++void adhr_tx_queue_clear_dropped(adhr_tx_queue_t *queue)
++{
++    queue->dropped = 0;
++}
+diff --git a/openrtx/src/rtx/adhr_usb_rxonly.c b/openrtx/src/rtx/adhr_usb_rxonly.c
+new file mode 100644
+index 0000000..23f9c35
+--- /dev/null
++++ b/openrtx/src/rtx/adhr_usb_rxonly.c
+@@ -0,0 +1,95 @@
++/*
++ * SPDX-FileCopyrightText: Copyright 2026 Ad Hoc Radio Contributors
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ */
++
++#include "rtx/adhr_usb_rxonly.h"
++
++#include "drivers/usb_vcom.h"
++#include "interfaces/delays.h"
++#include "rtx/adhr_rxonly.h"
++#include "rtx/adhr_tx_queue.h"
++
++#include <stdio.h>
++#include <stdint.h>
++#include <unistd.h>
++
++static adhr_rxonly_context_t context;
++static adhr_tx_queue_t tx_queue;
++static bool tx_in_flight;
++
++static void usb_emit(const char *line, size_t length, void *user)
++{
++    (void) user;
++    (void) adhr_tx_queue_push(&tx_queue, line, length);
++}
++
++static void complete_tx(void)
++{
++    if(tx_in_flight && vcom_writeReady())
++    {
++        adhr_tx_queue_pop(&tx_queue);
++        tx_in_flight = false;
++    }
++}
++
++static void queue_backpressure(void)
++{
++    char message[80];
++    uint32_t dropped = adhr_tx_queue_dropped(&tx_queue);
++    int length;
++
++    if((dropped == 0) || (tx_queue.count >= ADHR_TX_QUEUE_CAPACITY))
++        return;
++
++    length = snprintf(message, sizeof(message),
++                      "ADHR1 ERROR code=output_backpressure dropped=%lu\n",
++                      (unsigned long) dropped);
++    if((length > 0) && ((size_t) length < sizeof(message))
++       && adhr_tx_queue_push(&tx_queue, message, (size_t) length))
++        adhr_tx_queue_clear_dropped(&tx_queue);
++}
++
++static void start_one_tx(void)
++{
++    const char *data;
++    size_t length;
++
++    if(tx_in_flight)
++        return;
++
++    data = adhr_tx_queue_front(&tx_queue);
++    length = adhr_tx_queue_front_length(&tx_queue);
++    if((data != NULL) && (vcom_tryWriteBlock(data, length) > 0))
++        tx_in_flight = true;
++}
++
++void adhr_usb_rxonly_init(void)
++{
++    adhr_rxonly_init(&context, usb_emit, NULL);
++    adhr_tx_queue_init(&tx_queue);
++    tx_in_flight = false;
++}
++
++void adhr_usb_rxonly_poll(void)
++{
++    uint8_t buffer[32];
++    long long tick = getTick();
++    uint64_t now = tick < 0 ? 0 : (uint64_t) tick;
++    unsigned int reads;
++
++    complete_tx();
++
++    for(reads = 0; reads < 8; reads++)
++    {
++        ssize_t count = vcom_readBlock(buffer, sizeof(buffer));
++        if(count <= 0)
++            break;
++        adhr_rxonly_feed(&context, buffer, (size_t) count, now);
++    }
++
++    adhr_rxonly_poll(&context, now);
++    queue_backpressure();
++    start_one_tx();
++}
+diff --git a/openrtx/src/rtx/rtx.cpp b/openrtx/src/rtx/rtx.cpp
+index 5470432..a1e92bc 100644
+--- a/openrtx/src/rtx/rtx.cpp
++++ b/openrtx/src/rtx/rtx.cpp
+@@ -10,6 +10,9 @@
+ #include "rtx/rtx.h"
+ #include "rtx/OpMode_FM.hpp"
+ #include "rtx/OpMode_M17.hpp"
++#if defined(CONFIG_ADHR_RX_ONLY) && !defined(PLATFORM_LINUX)
++#include "rtx/adhr_usb_rxonly.h"
++#endif
+ 
+ static pthread_mutex_t   *cfgMutex;     // Mutex for incoming config messages
+ static const rtxStatus_t *newCnf;       // Pointer for incoming config messages
+@@ -37,6 +40,9 @@ void rtx_init(pthread_mutex_t *m)
+     rtxStatus.opMode        = OPMODE_NONE;
+     rtxStatus.bandwidth     = BW_25;
+     rtxStatus.txDisable     = 0;
++#if defined(CONFIG_ADHR_RX_ONLY)
++    rtxStatus.txDisable     = 1;
++#endif
+     rtxStatus.opStatus      = OFF;
+     rtxStatus.rxFrequency   = 430000000;
+     rtxStatus.txFrequency   = 430000000;
+@@ -66,6 +72,9 @@ void rtx_init(pthread_mutex_t *m)
+      */
+     rssi         = radio_getRssi();
+     reinitFilter = false;
++#if defined(CONFIG_ADHR_RX_ONLY) && !defined(PLATFORM_LINUX)
++    adhr_usb_rxonly_init();
++#endif
+ }
+ 
+ void rtx_terminate()
+@@ -96,6 +105,10 @@ rtxStatus_t rtx_getCurrentStatus()
+ 
+ void rtx_task()
+ {
++#if defined(CONFIG_ADHR_RX_ONLY) && !defined(PLATFORM_LINUX)
++    adhr_usb_rxonly_poll();
++#endif
++
+     // Check if there is a pending new configuration and, in case, read it.
+     bool reconfigure = false;
+     if(pthread_mutex_trylock(cfgMutex) == 0)
+@@ -106,6 +119,9 @@ void rtx_task()
+             uint8_t tmp = rtxStatus.opStatus;
+             memcpy(&rtxStatus, newCnf, sizeof(rtxStatus_t));
+             rtxStatus.opStatus = tmp;
++#if defined(CONFIG_ADHR_RX_ONLY)
++            rtxStatus.txDisable = 1;
++#endif
+ 
+             reconfigure = true;
+             newCnf = NULL;
+diff --git a/platform/drivers/baseband/radio_UV3x0.cpp b/platform/drivers/baseband/radio_UV3x0.cpp
+index 64b77a9..0cbe568 100644
+--- a/platform/drivers/baseband/radio_UV3x0.cpp
++++ b/platform/drivers/baseband/radio_UV3x0.cpp
+@@ -32,8 +32,19 @@ static enum opstatus radioStatus;                // Current operating status
+ HR_C6000 C6000((const struct spiDevice *) &c6000_spi, { DMR_CS }); // HR_C6000 driver
+ static AT1846S& at1846s = AT1846S::instance();   // AT1846S driver
+ 
++#if defined(CONFIG_ADHR_RX_ONLY)
++extern "C" __attribute__((used))
++const char adhr_rxonly_build_marker[] = "ADHR_RX_ONLY:v1";
++static const char * volatile adhr_marker_ptr = adhr_rxonly_build_marker;
++static volatile char adhr_marker_sink;
++#endif
++
+ void radio_init(const rtxStatus_t *rtxState)
+ {
++#if defined(CONFIG_ADHR_RX_ONLY)
++    adhr_marker_sink = adhr_marker_ptr[0];
++#endif
++
+     config      = rtxState;
+     radioStatus = OFF;
+ 
+@@ -175,6 +186,10 @@ void radio_enableRx()
+ 
+ void radio_enableTx()
+ {
++#if defined(CONFIG_ADHR_RX_ONLY)
++    return;
++#endif
++
+     if(config->txDisable == 1) return;
+ 
+     gpio_clearPin(VHF_LNA_EN);
+diff --git a/platform/mcu/STM32F4xx/drivers/usb_vcom.c b/platform/mcu/STM32F4xx/drivers/usb_vcom.c
+index 14377e0..3f2e5d1 100644
+--- a/platform/mcu/STM32F4xx/drivers/usb_vcom.c
++++ b/platform/mcu/STM32F4xx/drivers/usb_vcom.c
+@@ -43,7 +43,7 @@ struct rb
+ }
+ rxRingBuf;
+ 
+-bool txDone;    /* Flag for end of data transmission. */
++static volatile bool txDone;    /* Flag for end of data transmission. */
+ 
+ /* USB CDC device Configuration Descriptor */
+ uint8_t usbd_cdc_CfgDesc[USB_CDC_CONFIG_DESC_SIZ] =
+@@ -205,20 +205,48 @@ int vcom_init()
+     return 0;
+ }
+ 
+-ssize_t vcom_writeBlock(const void* buf, size_t len)
++bool vcom_writeReady(void)
++{
++    return txDone;
++}
++
++ssize_t vcom_tryWriteBlock(const void *buf, size_t len)
+ {
++    if((len == 0) || !txDone)
++        return 0;
++
+     txDone = false;
+     DCD_EP_Tx (&USB_OTG_dev, CDC_IN_EP, (uint8_t*) buf, len);
++    return len;
++}
+ 
++ssize_t vcom_writeBlock(const void* buf, size_t len)
++{
+     uint16_t timeout = 0;
+ 
+-    while(!txDone)
++    if(len == 0)
++        return 0;
++
++    while(vcom_tryWriteBlock(buf, len) == 0)
++    {
++        delayMs(1);
++        timeout++;
++        if(timeout > 500)
++        {
++            DCD_EP_Flush(&USB_OTG_dev, CDC_IN_EP);
++            txDone = true;
++            return -1;
++        }
++    }
++
++    while(!vcom_writeReady())
+     {
+         delayMs(1);
+         timeout++;
+         if(timeout > 500)
+         {
+             DCD_EP_Flush(&USB_OTG_dev, CDC_IN_EP);
++            txDone = true;
+             return -1;
+         }
+     }
+@@ -268,6 +296,7 @@ static uint8_t  usbd_cdc_Init (void  *pdev, uint8_t cfgidx)
+     /* Prepare Out endpoint to receive next packet */
+     DCD_EP_PrepareRx(pdev, CDC_OUT_EP, outEnpBuffer, CDC_DATA_OUT_PACKET_SIZE);
+ 
++    txDone = true;
+     return USBD_OK;
+ }
+ 
+@@ -284,6 +313,7 @@ static uint8_t  usbd_cdc_DeInit (void  *pdev, uint8_t cfgidx)
+     /* Open Command IN EP */
+     DCD_EP_Close(pdev,CDC_CMD_EP);
+ 
++    txDone = false;
+     return USBD_OK;
+ }
+ 
+diff --git a/platform/mcu/STM32F4xx/drivers/usb_vcom.h b/platform/mcu/STM32F4xx/drivers/usb_vcom.h
+index 653d96d..06e9a4a 100644
+--- a/platform/mcu/STM32F4xx/drivers/usb_vcom.h
++++ b/platform/mcu/STM32F4xx/drivers/usb_vcom.h
+@@ -7,6 +7,7 @@
+ #ifndef USB_VCOM_H
+ #define USB_VCOM_H
+ 
++#include <stdbool.h>
+ #include <stdint.h>
+ #include <unistd.h>
+ 
+@@ -35,6 +36,21 @@ int vcom_init();
+ */
+ ssize_t vcom_writeBlock(const void *buf, size_t len);
+ 
++/**
++* Check whether the IN endpoint can accept one asynchronous transfer.
++* \return true only when no transfer is in flight.
++*/
++bool vcom_writeReady(void);
++
++/**
++* Start one asynchronous transfer without waiting for completion.
++* The caller must retain the buffer until vcom_writeReady() is true.
++* \param buffer buffer where take data to write.
++* \param size buffer size.
++* \return number of accepted bytes, zero when busy, negative on failure.
++*/
++ssize_t vcom_tryWriteBlock(const void *buf, size_t len);
++
+ /**
+ * Read a block of data, nonblocking function.
+ * \param buffer buffer where read data will be stored.
+diff --git a/platform/targets/MD-UV3x0/hwconfig.h b/platform/targets/MD-UV3x0/hwconfig.h
+index 2ef8dc7..fec7a19 100644
+--- a/platform/targets/MD-UV3x0/hwconfig.h
++++ b/platform/targets/MD-UV3x0/hwconfig.h
+@@ -53,6 +53,9 @@ extern const struct Adc adc1;
+ /* Device supports M17 mode */
+ #define CONFIG_M17
+ 
++/* ADHR MVP-10.3: receive-side host contract, TX disabled. */
++#define CONFIG_ADHR_RX_ONLY
++
+ /* Microphone audio input */
+ #define CONFIG_MIC_GAIN 32
+ #define CONFIG_MIC_OVERSAMPLE 8

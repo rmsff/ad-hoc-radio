@@ -1,0 +1,127 @@
+{
+  "artifact_id": "openrtx-mduv3x0-adhr-snap-build-20260708",
+  "status": "firmware_written_normal_boot_pending",
+  "measured_at": "2026-07-08",
+  "source": {
+    "repo": "https://github.com/OpenRTX/OpenRTX.git",
+    "tag": "v0.4.4",
+    "commit": "801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+    "local_checkout": "/tmp/adhr-openrtx-isolated/OpenRTX",
+    "build_dir": "/tmp/adhr-openrtx-isolated/OpenRTX/build_cm4_adhr_snap"
+  },
+  "target": {
+    "radio_family": "TYT MD-UV380 / MD-UV3x0",
+    "openrtx_target": "mduv3x0",
+    "miosix_cross_file": "cross_cm4.txt"
+  },
+  "patch": {
+    "local_patch": ".artifacts/openrtx-adhr-snap-20260708/adhr-bench-usb-snap.patch",
+    "sha256": "707b3539ef9da0a7cc115732ed6448f9a680e02b9482babf20d73c9fb5e0f06b",
+    "features": [
+      "CONFIG_ADHR_BENCH_RX_ONLY remains enabled",
+      "radio_enableTx compiles to immediate return",
+      "ADHR SETNFM <freq_hz> enables a persistent analog NFM receive-only override",
+      "ADHR SETFM <freq_hz> enables a persistent analog FM receive-only override",
+      "ADHR CLEAR disables the forced analog override",
+      "ADHR SNAP emits an immediate ADHR RX snapshot without depending on streaming telemetry",
+      "SETFM/SETNFM reject frequencies outside 136000000..480000000 Hz"
+    ]
+  },
+  "artifacts": {
+    "elf": {
+      "path": ".artifacts/openrtx-adhr-snap-20260708/openrtx_mduv3x0_adhr_snap.elf",
+      "bytes": 4313760,
+      "sha256": "5db0256986a6dc005529a72bfcd7a760ab8660a6ea7d56bbce3b4b4d953c9a55"
+    },
+    "raw_bin": {
+      "path": ".artifacts/openrtx-adhr-snap-20260708/openrtx_mduv3x0_adhr_snap_bin",
+      "bytes": 236392,
+      "sha256": "67f2b5458a829be722fa103029ef25e36baeb0af0109389c7d8b805d75d6df15"
+    },
+    "wrapped_firmware": {
+      "path": ".artifacts/openrtx-adhr-snap-20260708/openrtx_mduv3x0_adhr_snap_wrap",
+      "bytes": 236904,
+      "sha256": "b0016960d80e9ed7db55616e0ef7fd61902f8297432630589b3ee228f8c7af7d"
+    },
+    "map": {
+      "path": ".artifacts/openrtx-adhr-snap-20260708/openrtx_mduv3x0_adhr_snap.map",
+      "bytes": 891412,
+      "sha256": "5f56b1d05e35c536836a64933c93717d92ec846907a54a7f0120dfcf02093deb"
+    }
+  },
+  "resource_use": {
+    "elf_text_bytes": 234668,
+    "elf_data_bytes": 1720,
+    "elf_bss_bytes": 53216,
+    "elf_total_dec_bytes": 289604,
+    "flash_used_bytes": 236392,
+    "flash_region_bytes": 868352,
+    "flash_percent": 27.22,
+    "smallram_used_bytes": 13976,
+    "smallram_region_bytes": 65536,
+    "smallram_percent": 21.33,
+    "largeram_used_bytes": 40960,
+    "largeram_region_bytes": 130560,
+    "largeram_percent": 31.37
+  },
+  "symbol_checks": {
+    "radio_enableTx": "08018660 <radio_enableTx>: 4770 bx lr",
+    "adhr_bench_build_marker": "0803f068 00000016 T adhr_bench_build_marker",
+    "adhrForcedBandwidth": "100015f9 00000001 b adhrForcedBandwidth",
+    "adhrForcedFrequency": "100015fc 00000004 b adhrForcedFrequency",
+    "adhrTelemetryEnabled": "10001600 00000001 b adhrTelemetryEnabled",
+    "adhrTelemetryForceEmit": "10001601 00000001 b adhrTelemetryForceEmit",
+    "adhrForcedAnalogEnabled": "10001602 00000001 b adhrForcedAnalogEnabled"
+  },
+  "firmware_strings": [
+    "ADHR_BENCH_RX_ONLY:v0",
+    "ADHR RX seq=%lu op=%u st=%u bw=%u rx=%lu tx=%lu rssi=%ld sql=%u sq=%u tone=%u txdis=%u",
+    "ADHR START",
+    "ADHR OK START v1",
+    "ADHR STOP",
+    "ADHR OK STOP v1",
+    "ADHR PING",
+    "ADHR OK PONG v1",
+    "ADHR SNAP",
+    "ADHR SETNFM ",
+    "ADHR OK SETNFM v1",
+    "ADHR ERR FREQ v1",
+    "ADHR SETFM ",
+    "ADHR OK SETFM v1",
+    "ADHR CLEAR",
+    "ADHR OK CLEAR v1"
+  ],
+  "host_protocol": {
+    "transport": "OpenRTX normal-mode USB CDC /dev/ttyACM* after flash and reboot",
+    "ping_command": "ADHR PING\\n",
+    "set_nfm_433525_command": "ADHR SETNFM 433525000\\n",
+    "snap_command": "ADHR SNAP\\n",
+    "clear_command": "ADHR CLEAR\\n",
+    "event_line_prefix": "ADHR RX ",
+    "expected_after_setnfm_433525_snap": "ADHR RX ... op=1 st=1 bw=0 rx=433525000 tx=433525000 ... txdis=1"
+  },
+  "flash_write": {
+    "performed_at": "2026-07-08",
+    "host": "NanoPi FriendlyWrt 23.05.5",
+    "remote_firmware_path": "/root/adhr-radio/openrtx_mduv3x0_adhr_snap_wrap",
+    "remote_firmware_sha256": "b0016960d80e9ed7db55616e0ef7fd61902f8297432630589b3ee228f8c7af7d",
+    "required_usb_mode": "TYT firmware update / DFU mode",
+    "pre_write_usb_device": "0483:df11 AnyRoad Technology Digital Radio in USB mode",
+    "command": "/usr/local/bin/radio_tool -d 0 -f -i /root/adhr-radio/openrtx_mduv3x0_adhr_snap_wrap",
+    "result": "Done!",
+    "remote_flash_log": "/root/adhr-radio/logs/openrtx-adhr-snap-flash-20260708.log",
+    "local_flash_log": ".artifacts/md-uv380-openrtx-snap-flash-20260708/openrtx-adhr-snap-flash-20260708.log",
+    "flash_log_sha256": "a7b2aadd81ea55b7eb4f56d900dbaabdad55ad34bcd8569f63f1553e7628941e",
+    "post_write_usb_device": "0483:df11 AnyRoad Technology Digital Radio in USB mode"
+  },
+  "claim_limits": {
+    "not_flashed": false,
+    "normal_boot_telemetry_verified": false,
+    "hardware_claim_allowed": false,
+    "field_tx_ready": false,
+    "rf_tx_tested": false,
+    "audio_capture": "not implemented",
+    "adhr_frame_rx": "not implemented"
+  },
+  "next_gate": "power_cycle_to_normal_mode_then_verify_ADHR_SETNFM_and_ADHR_SNAP_before_squelch_transition_capture"
+}

@@ -1,0 +1,3 @@
+ad-hoc-radio MVP-8.8 synthetic clean voice fixture v1
+purpose: deterministic artifact for audio intelligibility envelope tests
+not a recorded human voice and not a subjective MOS fixture

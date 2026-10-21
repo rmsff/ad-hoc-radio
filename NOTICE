@@ -1,0 +1,62 @@
+Ad Hoc Radio
+Copyright 2026 Ad Hoc Radio Contributors
+
+This product includes software developed by the Ad Hoc Radio project,
+licensed under the Apache License, Version 2.0 (see LICENSE), except where a
+file or directory states otherwise.
+
+Documentation (docs/ and the Markdown files in this repository) is licensed
+under the Creative Commons Attribution 4.0 International License (CC BY 4.0,
+https://creativecommons.org/licenses/by/4.0/), except quoted third-party
+material, which remains under its own license.
+
+Directory-specific licensing
+----------------------------
+
+firmware/openrtx-*
+  Patches, overlays, build scripts and evidence for OpenRTX
+  (https://github.com/OpenRTX/OpenRTX). Everything in these directories is
+  licensed under the GNU General Public License v3.0 or later
+  (see firmware/openrtx-mvp10.3/LICENSE), as is OpenRTX itself.
+
+firmware/opengd77-*
+  This project's own ADHR sources (adhr_*), host tests and a host-side USB
+  bench tool, licensed under Apache-2.0. The adhr_* sources build only on top
+  of OpenGD77 (https://www.opengd77.com/), which is not included. The OpenGD77
+  license forbids commercial use; any firmware image built with OpenGD77 is
+  subject to that license. Patches and build tooling that contain OpenGD77
+  source lines are not distributed.
+
+Third-party data included
+-------------------------
+
+configs/audio/opus-transport-trace-20260906.json contains Opus packets
+encoded from two recordings on Wikimedia Commons (speaker: Шантопик; text by
+A. S. Pushkin), licensed CC BY-SA 4.0
+(https://creativecommons.org/licenses/by-sa/4.0/). The file is an adapted work
+under the same license; its "attribution" field lists the sources and changes:
+
+- File:Ru-Что_в_имени_тебе_моем.ogg (oldid 1041724217)
+- File:Ru-Если_жизнь_тебя_обманет.ogg (oldid 1041723381)
+
+The audio files themselves are not included; the listening scripts download
+them from the pinned sources in configs/audio/listening-20260906.json.
+
+Third-party software used but not included
+------------------------------------------
+
+The scripts download or call these at a pinned version; none is vendored.
+
+- Codec2 (LGPL-2.1), https://github.com/drowe67/codec2,
+  commit 06d4c11e699b0351765f10398abb4f663a984f36
+- Opus 1.5.2 (BSD-3-Clause), https://opus-codec.org/
+- Lyra (Apache-2.0), https://github.com/google/lyra,
+  commit 47698dadf0010abff6a848e02642f55f806d4842
+- OpenRTX (GPL-3.0), OpenGD77 (non-commercial BSD-style license),
+  radio_tool, dmrconfig, md380tools (md380_read_spi.py) and pyusb: used for
+  firmware builds and radio backup/restore.
+- BMAD Method (MIT), https://github.com/bmad-code-org/BMAD-METHOD: used as
+  development process tooling; its files are not included.
+
+Official TYT firmware images, vendor manuals and radio backups are never
+distributed by this project.

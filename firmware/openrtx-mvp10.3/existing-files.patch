@@ -1,0 +1,237 @@
+diff --git a/meson.build b/meson.build
+index 92939e6..27543ec 100644
+--- a/meson.build
++++ b/meson.build
+@@ -410,7 +410,10 @@ mduv3x0_src = ['platform/drivers/CPS/cps_io_native_MDUV3x0.c',
+                'platform/drivers/audio/Cx000_dac.cpp',
+                'platform/drivers/baseband/radio_UV3x0.cpp',
+                'platform/drivers/baseband/AT1846S_UV3x0.cpp',
+-               'platform/drivers/baseband/HR_C6000_UV3x0.cpp']
++               'platform/drivers/baseband/HR_C6000_UV3x0.cpp',
++               'openrtx/src/rtx/adhr_rxonly.c',
++               'openrtx/src/rtx/adhr_tx_queue.c',
++               'openrtx/src/rtx/adhr_usb_rxonly.c']
+ 
+ mduv3x0_inc = ['platform/targets/MD-UV3x0']
+ mduv3x0_def =  {'PLATFORM_MDUV3x0': '', 'timegm': 'mktime'}
+diff --git a/openrtx/src/rtx/rtx.cpp b/openrtx/src/rtx/rtx.cpp
+index 5470432..6fb105f 100644
+--- a/openrtx/src/rtx/rtx.cpp
++++ b/openrtx/src/rtx/rtx.cpp
+@@ -11,6 +11,9 @@
+ #include "rtx/rtx.h"
+ #include "rtx/OpMode_FM.hpp"
+ #include "rtx/OpMode_M17.hpp"
++#if defined(CONFIG_ADHR_RX_ONLY) && !defined(PLATFORM_LINUX)
++#include "rtx/adhr_usb_rxonly.h"
++#endif
+ 
+ static pthread_mutex_t   *cfgMutex;     // Mutex for incoming config messages
+ static const rtxStatus_t *newCnf;       // Pointer for incoming config messages
+@@ -37,6 +40,9 @@ void rtx_init(pthread_mutex_t *m)
+     rtxStatus.opMode        = OPMODE_NONE;
+     rtxStatus.bandwidth     = BW_25;
+     rtxStatus.txDisable     = 0;
++#if defined(CONFIG_ADHR_RX_ONLY)
++    rtxStatus.txDisable     = 1;
++#endif
+     rtxStatus.opStatus      = OFF;
+     rtxStatus.rxFrequency   = 430000000;
+     rtxStatus.txFrequency   = 430000000;
+@@ -66,6 +72,9 @@ void rtx_init(pthread_mutex_t *m)
+      */
+     rssi         = radio_getRssi();
+     reinitFilter = false;
++#if defined(CONFIG_ADHR_RX_ONLY) && !defined(PLATFORM_LINUX)
++    adhr_usb_rxonly_init();
++#endif
+ }
+ 
+ void rtx_terminate()
+@@ -96,6 +105,10 @@ rtxStatus_t rtx_getCurrentStatus()
+ 
+ void rtx_task()
+ {
++#if defined(CONFIG_ADHR_RX_ONLY) && !defined(PLATFORM_LINUX)
++    adhr_usb_rxonly_poll();
++#endif
++
+     // Check if there is a pending new configuration and, in case, read it.
+     bool reconfigure = false;
+     if(pthread_mutex_trylock(cfgMutex) == 0)
+@@ -106,6 +119,9 @@ void rtx_task()
+             uint8_t tmp = rtxStatus.opStatus;
+             memcpy(&rtxStatus, newCnf, sizeof(rtxStatus_t));
+             rtxStatus.opStatus = tmp;
++#if defined(CONFIG_ADHR_RX_ONLY)
++            rtxStatus.txDisable = 1;
++#endif
+ 
+             reconfigure = true;
+             newCnf = NULL;
+diff --git a/platform/drivers/baseband/radio_UV3x0.cpp b/platform/drivers/baseband/radio_UV3x0.cpp
+index 64b77a9..51ceba2 100644
+--- a/platform/drivers/baseband/radio_UV3x0.cpp
++++ b/platform/drivers/baseband/radio_UV3x0.cpp
+@@ -32,8 +32,19 @@ static enum opstatus radioStatus;                // Current operating status
+ HR_C6000 C6000((const struct spiDevice *) &c6000_spi, { DMR_CS }); // HR_C6000 driver
+ static AT1846S& at1846s = AT1846S::instance();   // AT1846S driver
+ 
++#if defined(CONFIG_ADHR_RX_ONLY)
++extern "C" __attribute__((used))
++const char adhr_rxonly_build_marker[] = "ADHR_RX_ONLY:v1";
++static const char * volatile adhr_marker_ptr = adhr_rxonly_build_marker;
++static volatile char adhr_marker_sink;
++#endif
++
+ void radio_init(const rtxStatus_t *rtxState)
+ {
++#if defined(CONFIG_ADHR_RX_ONLY)
++    adhr_marker_sink = adhr_marker_ptr[0];
++#endif
++
+     config      = rtxState;
+     radioStatus = OFF;
+ 
+@@ -175,6 +186,10 @@ void radio_enableRx()
+ 
+ void radio_enableTx()
+ {
++#if defined(CONFIG_ADHR_RX_ONLY)
++    return;
++#endif
++
+     if(config->txDisable == 1) return;
+ 
+     gpio_clearPin(VHF_LNA_EN);
+diff --git a/platform/targets/MD-UV3x0/hwconfig.h b/platform/targets/MD-UV3x0/hwconfig.h
+index 2ef8dc7..4b3e671 100644
+--- a/platform/targets/MD-UV3x0/hwconfig.h
++++ b/platform/targets/MD-UV3x0/hwconfig.h
+@@ -53,6 +53,9 @@ extern const struct Adc adc1;
+ /* Device supports M17 mode */
+ #define CONFIG_M17
+ 
++/* ADHR MVP-10.3: receive-side host contract, TX disabled. */
++#define CONFIG_ADHR_RX_ONLY
++
+ /* Microphone audio input */
+ #define CONFIG_MIC_GAIN 32
+ #define CONFIG_MIC_OVERSAMPLE 8
+diff --git a/platform/mcu/STM32F4xx/drivers/usb_vcom.c b/platform/mcu/STM32F4xx/drivers/usb_vcom.c
+index df45179..243975e 100644
+--- a/platform/mcu/STM32F4xx/drivers/usb_vcom.c
++++ b/platform/mcu/STM32F4xx/drivers/usb_vcom.c
+@@ -43,7 +43,7 @@ struct rb
+ }
+ rxRingBuf;
+ 
+-bool txDone;    /* Flag for end of data transmission. */
++static volatile bool txDone;    /* Flag for end of data transmission. */
+ 
+ /* USB CDC device Configuration Descriptor */
+ uint8_t usbd_cdc_CfgDesc[USB_CDC_CONFIG_DESC_SIZ] =
+@@ -205,24 +205,52 @@ int vcom_init()
+     return 0;
+ }
+ 
+-ssize_t vcom_writeBlock(const void* buf, size_t len)
++bool vcom_writeReady(void)
+ {
++    return txDone;
++}
++
++ssize_t vcom_tryWriteBlock(const void *buf, size_t len)
++{
++    if((len == 0) || !txDone)
++        return 0;
++
+     txDone = false;
+     DCD_EP_Tx (&USB_OTG_dev, CDC_IN_EP, (uint8_t*) buf, len);
++    return len;
++}
++
++ssize_t vcom_writeBlock(const void* buf, size_t len)
++{
++    uint16_t timeout = 0;
+ 
+-    uint16_t timeout = 0;
++    if(len == 0)
++        return 0;
+ 
+-    while(!txDone)
++    while(vcom_tryWriteBlock(buf, len) == 0)
+     {
+         delayMs(1);
+         timeout++;
+         if(timeout > 500)
+         {
+             DCD_EP_Flush(&USB_OTG_dev, CDC_IN_EP);
++            txDone = true;
+             return -1;
+         }
+     }
+ 
++    while(!vcom_writeReady())
++    {
++        delayMs(1);
++        timeout++;
++        if(timeout > 500)
++        {
++            DCD_EP_Flush(&USB_OTG_dev, CDC_IN_EP);
++            txDone = true;
++            return -1;
++        }
++    }
++
+     return len;
+ }
+ 
+@@ -266,6 +294,7 @@ static uint8_t  usbd_cdc_Init (void  *pdev, uint8_t cfgidx)
+     /* Prepare Out endpoint to receive next packet */
+     DCD_EP_PrepareRx(pdev, CDC_OUT_EP, outEnpBuffer, CDC_DATA_OUT_PACKET_SIZE);
+ 
++    txDone = true;
+     return USBD_OK;
+ }
+ 
+@@ -284,5 +313,6 @@ static uint8_t  usbd_cdc_DeInit (void  *pdev, uint8_t cfgidx)
+     /* Open Command IN EP */
+     DCD_EP_Close(pdev,CDC_CMD_EP);
+ 
++    txDone = false;
+     return USBD_OK;
+ }
+diff --git a/platform/mcu/STM32F4xx/drivers/usb_vcom.h b/platform/mcu/STM32F4xx/drivers/usb_vcom.h
+index 22835ea..8e784b1 100644
+--- a/platform/mcu/STM32F4xx/drivers/usb_vcom.h
++++ b/platform/mcu/STM32F4xx/drivers/usb_vcom.h
+@@ -7,5 +7,6 @@
+ #define USB_VCOM_H
+ 
++#include <stdbool.h>
+ #include <stdint.h>
+ #include <unistd.h>
+ 
+@@ -41,6 +42,21 @@ int vcom_init();
+ */
+ ssize_t vcom_writeBlock(const void *buf, size_t len);
+ 
++/**
++* Check whether the IN endpoint can accept one asynchronous transfer.
++* \return true only when no transfer is in flight.
++*/
++bool vcom_writeReady(void);
++
++/**
++* Start one asynchronous transfer without waiting for completion.
++* The caller must retain the buffer until vcom_writeReady() is true.
++* \param buffer buffer where take data to write.
++* \param size buffer size.
++* \return number of accepted bytes, zero when busy, negative on failure.
++*/
++ssize_t vcom_tryWriteBlock(const void *buf, size_t len);
++
+ /**
+ * Read a block of data, nonblocking function.
+ * \param buffer buffer where read data will be stored.

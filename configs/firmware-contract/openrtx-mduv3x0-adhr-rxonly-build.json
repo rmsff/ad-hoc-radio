@@ -1,0 +1,64 @@
+{
+  "artifact_id": "openrtx-mduv3x0-adhr-rxonly-build-v0",
+  "status": "build_verified_not_flashed",
+  "measured_at": "2026-07-07",
+  "source": {
+    "repo": "https://github.com/OpenRTX/OpenRTX.git",
+    "tag": "v0.4.4",
+    "commit": "801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+    "target": "mduv3x0",
+    "build_dir": "/tmp/adhr-openrtx-isolated/OpenRTX/build_cm4_adhr_rxonly"
+  },
+  "patch": {
+    "artifact_path": ".artifacts/openrtx-adhr-rxonly-20260707/adhr-bench-rx-only.patch",
+    "sha256": "c9435119bc9a1125a1cd49339edd247827ddef3f1ac3975b3240287f6dd452d6",
+    "guards": [
+      "CONFIG_ADHR_BENCH_RX_ONLY",
+      "rtxStatus.txDisable=1",
+      "radio_enableTx early return"
+    ]
+  },
+  "build_environment": {
+    "isolation": "docker linux/amd64",
+    "builder_image": "adhr-openrtx-builder:ubuntu24-miosix9.2",
+    "miosix_toolchain": "GCC 9.2.0-mp3.2",
+    "meson": "1.3.2"
+  },
+  "measured_size": {
+    "elf_text_bytes": 219916,
+    "elf_data_bytes": 1720,
+    "elf_bss_bytes": 53160,
+    "elf_total_dec_bytes": 274796,
+    "firmware_bin_bytes": 221640,
+    "wrapped_firmware_bytes": 222152,
+    "map_bytes": 880284
+  },
+  "baseline_delta": {
+    "baseline_firmware_bin_bytes": 222312,
+    "baseline_wrapped_firmware_bytes": 222824,
+    "firmware_bin_delta_bytes": -672,
+    "wrapped_firmware_delta_bytes": -672
+  },
+  "sha256": {
+    "patch": "c9435119bc9a1125a1cd49339edd247827ddef3f1ac3975b3240287f6dd452d6",
+    "bin": "dc432e821ee4ace7bc242a48952a3df48d1a0008971765abacca7a85ba569b59",
+    "wrap": "bbbf51dae865ff7e827497635e64f0c7ee1861b8183a0452b926942ca7b507b1",
+    "map": "f321596aa4455cb9b80cd77ddff58e55688325e1554751563107f4cc3ca95a8b",
+    "symbol_check": "8eb137c0305e325bfa1625a41fbd9e8eefff7ff3cebdcce88a1c1ad1f7675210"
+  },
+  "marker": {
+    "bin_present": true,
+    "wrap_present": false
+  },
+  "symbol_check": {
+    "path": ".artifacts/openrtx-adhr-rxonly-20260707/symbol-check.txt",
+    "radio_enableTx_disassembly": "080153d4 <radio_enableTx>: 4770 bx lr",
+    "adhr_bench_build_marker_symbol": "0803b820 T adhr_bench_build_marker"
+  },
+  "claim_limits": {
+    "firmware_flash_ready": false,
+    "hardware_claim_allowed": false,
+    "field_tx_ready": false,
+    "not_flashed": true
+  }
+}

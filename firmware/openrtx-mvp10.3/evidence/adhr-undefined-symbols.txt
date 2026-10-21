@@ -1,0 +1,25 @@
+[adhr_rxonly.c.o]
+         U __aeabi_uldivmod
+         U memset
+         U strcmp
+         U strlen
+         U vsnprintf
+[adhr_tx_queue.c.o]
+         U memcpy
+         U memset
+[adhr_usb_rxonly.c.o]
+         U adhr_rxonly_feed
+         U adhr_rxonly_init
+         U adhr_rxonly_poll
+         U adhr_tx_queue_clear_dropped
+         U adhr_tx_queue_dropped
+         U adhr_tx_queue_front
+         U adhr_tx_queue_front_length
+         U adhr_tx_queue_init
+         U adhr_tx_queue_pop
+         U adhr_tx_queue_push
+         U getTick
+         U snprintf
+         U vcom_readBlock
+         U vcom_tryWriteBlock
+         U vcom_writeReady

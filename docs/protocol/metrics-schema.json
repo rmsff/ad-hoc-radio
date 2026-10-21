@@ -1,0 +1,383 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rmsff/ad-hoc-radio/docs/protocol/metrics-schema.json",
+  "title": "Ad Hoc Radio Simulation Metrics",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "voiceBudgetProfile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "codec_bitrate_bps", "packet_period_ms", "gross_bitrate_bps", "fec_numerator", "fec_denominator", "framing_bits", "rx_to_tx_us", "tx_to_rx_us", "processing_us", "uncertainty_us", "slot_us", "burst_us", "max_payload_bytes"],
+      "properties": {
+        "id": {"type":"string", "minLength":1},
+        "codec_bitrate_bps": {"type":"integer", "minimum":1},
+        "packet_period_ms": {"type":"integer", "minimum":1},
+        "gross_bitrate_bps": {"type":"integer", "minimum":1},
+        "fec_numerator": {"type":"integer", "minimum":1},
+        "fec_denominator": {"type":"integer", "minimum":1},
+        "framing_bits": {"type":"integer", "minimum":0},
+        "rx_to_tx_us": {"type":"integer", "minimum":0},
+        "tx_to_rx_us": {"type":"integer", "minimum":0},
+        "processing_us": {"type":"integer", "minimum":0},
+        "uncertainty_us": {"type":"integer", "minimum":0},
+        "slot_us": {"type":"integer", "minimum":0},
+        "burst_us": {"type":"integer", "minimum":0},
+        "max_payload_bytes": {"type":"integer", "minimum":0}
+      }
+    },
+    "scheduledWire": {
+      "type":"object", "additionalProperties":false,
+      "required":["profile","budget","evidence_grade","audio_quality_verified","hardware_measured"],
+      "properties": {
+        "profile":{"$ref":"#/$defs/voiceBudgetProfile"},
+        "evidence_grade":{"const":"synthetic_size_fixture"},
+        "audio_quality_verified":{"const":false}, "hardware_measured":{"const":false},
+        "budget": {
+          "type":"object", "additionalProperties":false,
+          "required":["wire_bytes","protected_bits","airtime_us","guard_us","occupied_us","duration_ms","guard_ms","fits_backend"],
+          "properties": {
+            "wire_bytes":{"type":"integer","minimum":1},
+            "protected_bits":{"type":"integer","minimum":1},
+            "airtime_us":{"type":"integer","minimum":1},
+            "guard_us":{"type":"integer","minimum":0},
+            "occupied_us":{"type":"integer","minimum":1},
+            "duration_ms":{"type":"integer","minimum":1},
+            "guard_ms":{"type":"integer","minimum":0},
+            "fits_backend":{"type":"boolean"}
+          }
+        }
+      }
+    },
+    "peerControl": {
+      "type":"object", "additionalProperties":false,
+      "required":["attempts","bytes","airtime_us","lost","invalid","unreachable","rejected","expired_tx","commits"],
+      "properties": {
+        "attempts":{"type":"integer","minimum":0}, "bytes":{"type":"integer","minimum":0},
+        "airtime_us":{"type":"integer","minimum":0}, "lost":{"type":"integer","minimum":0},
+        "invalid":{"type":"integer","minimum":0}, "unreachable":{"type":"integer","minimum":0},
+        "rejected":{"type":"integer","minimum":0}, "expired_tx":{"type":"integer","minimum":0},
+        "commits":{"type":"integer","minimum":0},
+        "duplicates":{"type":"integer","minimum":0},
+        "expirations":{"type":"integer","minimum":0},
+        "reacquisitions":{"type":"integer","minimum":0},
+        "collisions":{"type":"integer","minimum":0}
+      }
+    },
+    "scheduledAudio": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version", "service_outcome", "members", "arrival_latency_ms", "playout_latency_ms"],
+      "properties": {
+        "version": {"const": 2},
+        "service_outcome": {"enum": ["pass", "fail"]},
+        "arrival_latency_ms": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/relayDepthLatency"}]},
+        "playout_latency_ms": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/relayDepthLatency"}]},
+        "members": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false,
+          "required": ["member_id", "frames_expected", "frames_accepted", "frames_on_time", "frames_late", "frames_missing", "frames_played"],
+          "properties": {
+            "member_id": {"type": "integer", "minimum": 1},
+            "frames_expected": {"type": "integer", "minimum": 0},
+            "frames_accepted": {"type": "integer", "minimum": 0},
+            "frames_on_time": {"type": "integer", "minimum": 0},
+            "frames_late": {"type": "integer", "minimum": 0},
+            "frames_missing": {"type": "integer", "minimum": 0},
+            "frames_played": {"type": "integer", "minimum": 0}
+          }
+        }}
+      }
+    },
+    "dropReasonCounters": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {
+        "enum": [
+          "invalid",
+          "wrong_group",
+          "stale_frame",
+          "already_seen",
+          "ttl_expired",
+          "queue_full",
+          "call_not_active",
+          "late_frame",
+          "unsupported_frame_type",
+          "schedule_mismatch",
+          "schedule_expired",
+          "not_scheduled",
+          "reserved"
+        ]
+      },
+      "patternProperties": {
+        "^(invalid|wrong_group|stale_frame|already_seen|ttl_expired|queue_full|call_not_active|late_frame|unsupported_frame_type|schedule_mismatch|schedule_expired|not_scheduled|reserved)$": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "scheduledRelayTreeEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parent_station_id", "child_station_id", "hop"],
+      "properties": {
+        "parent_station_id": { "type": "integer", "minimum": 1 },
+        "child_station_id": { "type": "integer", "minimum": 1 },
+        "hop": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "relayDepthLatency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relay_depth", "sample_count", "min", "avg", "p50", "p95", "max"],
+      "properties": {
+        "relay_depth": { "type": "integer", "minimum": 0 },
+        "sample_count": { "type": "integer", "minimum": 0 },
+        "min": { "type": "number", "minimum": 0 },
+        "avg": { "type": "number", "minimum": 0 },
+        "p50": { "type": "number", "minimum": 0 },
+        "p95": { "type": "number", "minimum": 0 },
+        "max": { "type": "number", "minimum": 0 }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "seed",
+    "sim_duration_ms",
+    "stack",
+    "source_frames_created",
+    "source_frames_sent",
+    "links",
+    "relay",
+    "receiver",
+    "latency_ms",
+    "determinism",
+    "outcome"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "scenario_id": { "type": "string", "minLength": 1 },
+    "scenario_version": { "type": "string" },
+    "commit_sha": { "type": "string" },
+    "seed": { "type": "integer", "minimum": 0 },
+    "sim_duration_ms": { "type": "integer", "minimum": 0 },
+    "stack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language", "version"],
+      "properties": {
+        "language": { "type": "string", "const": "go" },
+        "version": { "type": "string" }
+      }
+    },
+    "two_hop_live": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relay_path",
+        "source_wire_mode",
+        "channel_bitrate_bps",
+        "source_frame_bytes",
+        "relay_frame_bytes",
+        "source_slot_ms",
+        "relay_slot_ms",
+        "guard_time_ms",
+        "link_delay_ms",
+        "source_airtime_ms",
+        "relay_airtime_ms",
+        "end_to_end_latency_ms",
+        "cycle_occupied_ms",
+        "cycle_spare_ms",
+        "slot_miss_count",
+        "relay_readiness_miss_count",
+        "relay1_frames_forwarded",
+        "relay2_frames_forwarded"
+      ],
+      "properties": {
+        "relay_path": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "source_wire_mode": { "type": "string", "enum": ["canonical", "short"] },
+        "channel_bitrate_bps": { "type": "integer", "minimum": 1 },
+        "source_frame_bytes": { "type": "integer", "minimum": 1 },
+        "relay_frame_bytes": { "type": "integer", "minimum": 1 },
+        "source_slot_ms": { "type": "integer", "minimum": 1 },
+        "relay_slot_ms": { "type": "integer", "minimum": 1 },
+        "guard_time_ms": { "type": "integer", "minimum": 0 },
+        "link_delay_ms": { "type": "integer", "minimum": 0 },
+        "source_airtime_ms": { "type": "integer", "minimum": 0 },
+        "relay_airtime_ms": { "type": "integer", "minimum": 0 },
+        "end_to_end_latency_ms": { "type": "integer", "minimum": 0 },
+        "cycle_occupied_ms": { "type": "integer", "minimum": 0 },
+        "cycle_spare_ms": { "type": "integer" },
+        "slot_miss_count": { "type": "integer", "minimum": 0 },
+        "relay_readiness_miss_count": { "type": "integer", "minimum": 0 },
+        "relay1_frames_forwarded": { "type": "integer", "minimum": 0 },
+        "relay2_frames_forwarded": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "scheduled_relay_tree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schedule_id",
+        "schedule_version",
+        "schedule_hash",
+        "tree_hash",
+        "result_hash",
+        "timing_strategy",
+        "timing_epoch_id",
+        "timing_authority_id",
+        "expected_member_ids",
+        "covered_member_ids",
+        "delivered_member_ids",
+        "uncovered_member_ids",
+        "selected_tree_edges",
+        "selected_relay_depth",
+        "tx_opportunity_count",
+        "schedule_cycle_duration_ms",
+        "voice_airtime_pct",
+        "control_airtime_pct",
+        "out_of_schedule_tx_count",
+        "missed_opportunity_count",
+        "schedule_mismatch_drop_count",
+        "schedule_expired_drop_count",
+        "not_scheduled_drop_count",
+        "latency_by_relay_depth",
+        "duplicate_playout_count",
+        "route_replan_count",
+        "version_activation_count"
+      ],
+      "properties": {
+        "audio": {"$ref": "#/$defs/scheduledAudio"},
+        "control": {"$ref": "#/$defs/peerControl"},
+        "wire": {"$ref": "#/$defs/scheduledWire"},
+        "expected_service_outcome": {"enum": ["pass", "fail"]},
+        "first_playout_ms": {"type":"integer", "minimum":0},
+        "collision_drop_count": {"type":"integer", "minimum":0},
+        "schedule_id": { "type": "integer", "minimum": 1 },
+        "schedule_version": { "type": "integer", "minimum": 1 },
+        "schedule_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "tree_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "result_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "timing_strategy": { "type": "string", "enum": ["source_led", "group_leader"] },
+        "timing_epoch_id": { "type": "integer", "minimum": 1 },
+        "timing_authority_id": { "type": "integer", "minimum": 1 },
+        "expected_member_ids": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+        "covered_member_ids": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+        "delivered_member_ids": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+        "uncovered_member_ids": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+        "selected_tree_edges": { "type": "array", "items": { "$ref": "#/$defs/scheduledRelayTreeEdge" } },
+        "selected_relay_depth": { "type": "integer", "minimum": 0 },
+        "tx_opportunity_count": { "type": "integer", "minimum": 1 },
+        "schedule_cycle_duration_ms": { "type": "integer", "minimum": 1 },
+        "voice_airtime_pct": { "type": "number", "minimum": 0 },
+        "control_airtime_pct": { "type": "number", "minimum": 0 },
+        "out_of_schedule_tx_count": { "type": "integer", "minimum": 0 },
+        "missed_opportunity_count": { "type": "integer", "minimum": 0 },
+        "schedule_mismatch_drop_count": { "type": "integer", "minimum": 0 },
+        "schedule_expired_drop_count": { "type": "integer", "minimum": 0 },
+        "not_scheduled_drop_count": { "type": "integer", "minimum": 0 },
+        "latency_by_relay_depth": { "type": "array", "items": { "$ref": "#/$defs/relayDepthLatency" } },
+        "duplicate_playout_count": { "type": "integer", "minimum": 0 },
+        "route_replan_count": { "type": "integer", "minimum": 0 },
+        "version_activation_count": { "type": "integer", "minimum": 0 },
+        "blocked_from_seq": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "source_frames_created": { "type": "integer", "minimum": 0 },
+    "source_frames_sent": { "type": "integer", "minimum": 0 },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "delivered", "lost", "corrupted", "duplicated"],
+        "properties": {
+          "from": { "type": "string", "minLength": 1 },
+          "to": { "type": "string", "minLength": 1 },
+          "delivered": { "type": "integer", "minimum": 0 },
+          "lost": { "type": "integer", "minimum": 0 },
+          "corrupted": { "type": "integer", "minimum": 0 },
+          "duplicated": { "type": "integer", "minimum": 0 },
+          "avg_delay_ms": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "relay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frames_received",
+        "frames_forwarded",
+        "dropped_by_reason",
+        "seen_cache_entries",
+        "seen_cache_evictions",
+        "forward_queue_max_depth",
+        "forward_queue_drops"
+      ],
+      "properties": {
+        "frames_received": { "type": "integer", "minimum": 0 },
+        "frames_forwarded": { "type": "integer", "minimum": 0 },
+        "dropped_by_reason": { "$ref": "#/$defs/dropReasonCounters" },
+        "seen_cache_entries": { "type": "integer", "minimum": 0 },
+        "seen_cache_evictions": { "type": "integer", "minimum": 0 },
+        "forward_queue_max_depth": { "type": "integer", "minimum": 0 },
+        "forward_queue_drops": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "receiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frames_received",
+        "frames_accepted",
+        "duplicates_suppressed",
+        "late_frames",
+        "missing_sequences",
+        "playout_frames_emitted",
+        "dropped_by_reason"
+      ],
+      "properties": {
+        "frames_received": { "type": "integer", "minimum": 0 },
+        "frames_accepted": { "type": "integer", "minimum": 0 },
+        "duplicates_suppressed": { "type": "integer", "minimum": 0 },
+        "late_frames": { "type": "integer", "minimum": 0 },
+        "missing_sequences": { "type": "integer", "minimum": 0 },
+        "playout_frames_emitted": { "type": "integer", "minimum": 0 },
+        "direct_frames_accepted": { "type": "integer", "minimum": 0 },
+        "relayed_frames_accepted": { "type": "integer", "minimum": 0 },
+        "dropped_by_reason": { "$ref": "#/$defs/dropReasonCounters" }
+      }
+    },
+    "latency_ms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min", "avg", "p50", "p95", "max"],
+      "properties": {
+        "min": { "type": "number", "minimum": 0 },
+        "avg": { "type": "number", "minimum": 0 },
+        "p50": { "type": "number", "minimum": 0 },
+        "p95": { "type": "number", "minimum": 0 },
+        "max": { "type": "number", "minimum": 0 },
+        "source_to_relay_avg": { "type": "number", "minimum": 0 },
+        "relay_to_receiver_avg": { "type": "number", "minimum": 0 },
+        "playout_avg": { "type": "number", "minimum": 0 }
+      }
+    },
+    "out_of_slot_tx_count": { "type": "integer", "minimum": 0, "default": 0 },
+    "determinism": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_count", "event_hash", "hash_algorithm", "serialization"],
+      "properties": {
+        "event_count": { "type": "integer", "minimum": 0 },
+        "event_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "hash_algorithm": { "type": "string", "const": "sha256" },
+        "serialization": { "type": "string", "const": "canonical-jsonl-v1" }
+      }
+    },
+    "outcome": { "type": "string", "enum": ["pass", "fail", "inconclusive"] },
+    "notes": { "type": "string" }
+  }
+}

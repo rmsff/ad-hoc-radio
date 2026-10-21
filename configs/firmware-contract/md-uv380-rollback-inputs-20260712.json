@@ -1,0 +1,70 @@
+{
+  "artifact_id": "md-uv380-rollback-inputs-20260712",
+  "schema_version": 1,
+  "story_id": "MVP-10.1",
+  "candidate_id": "openrtx_mduv3x0",
+  "radio": {
+    "model": "TYT MD-UV380",
+    "power_class": "5W",
+    "observed_intake_firmware": "D219.043",
+    "observed_intake_codeplug_version": "V02.37",
+    "recovery_firmware_family": "MD-UV380-AES255(REC)-D219.74"
+  },
+  "evidence": [
+    {
+      "evidence_id": "factory_codeplug_readback_after_recovery",
+      "path": ".artifacts/md-uv380-factory-reset-20260709/password-hard-clear/md-uv380-password-hard-clear-20260709-112817/factory-hard-clear-passwords.img",
+      "sha256": "2576e6b4fac29c776637e7a057b643cd9d65f0bf5927eacca1f705330a6c1ebe",
+      "size_bytes": 851968
+    },
+    {
+      "evidence_id": "factory_codeplug_write_log",
+      "path": ".artifacts/md-uv380-factory-reset-20260709/password-hard-clear/md-uv380-password-hard-clear-20260709-112817/write-hard-clear-passwords.log",
+      "sha256": "5122d69d4ae9605ff273e0ef5f8dc8a58fba8513a1a85315fbed681d16c04a8f",
+      "size_bytes": 134979
+    },
+    {
+      "evidence_id": "intake_codeplug_backup_primary",
+      "path": ".artifacts/md-uv380-readonly-20260707-192133/device.img",
+      "sha256": "15d22b36b3ccefb8aa200d2e42c268dfdaf64f616e500c4ad9054de537d09210",
+      "size_bytes": 851968
+    },
+    {
+      "evidence_id": "intake_codeplug_backup_verify",
+      "path": ".artifacts/md-uv380-readonly-20260707-192705-verify/device.img",
+      "sha256": "15d22b36b3ccefb8aa200d2e42c268dfdaf64f616e500c4ad9054de537d09210",
+      "size_bytes": 851968
+    },
+    {
+      "evidence_id": "same_family_internal_image",
+      "path": ".artifacts/md-uv380-official-d21974-restore-20260709/MD-UV380-AES255_REC-D219.74-internal-0x0800c000-decrypted.bin",
+      "sha256": "a40402dcaae4053fd45f7c75aa61ec38bc557a446a6cb3eceed5fe00f4ded241",
+      "size_bytes": 977920
+    },
+    {
+      "evidence_id": "same_family_radio_tool_image",
+      "path": ".artifacts/md-uv380-official-d21974-restore-20260709/radio-tool-wrap/MD-UV380-AES255_REC-D219.74-internal-uv3x0-wrap.bin",
+      "sha256": "433f3db627c981a28d977f7479d16d414e5ddfdf94d675f15d99fe484811aa44",
+      "size_bytes": 978432
+    },
+    {
+      "evidence_id": "same_family_restore_write_log",
+      "path": ".artifacts/md-uv380-official-d21974-restore-20260709/radio-tool-wrap/md-uv380-official-d21974-radio-tool-restore-20260709-095520.log",
+      "sha256": "054e685cab21a07adab09c047d69515d438abc3765407a5fdc8c523b44a77eb6",
+      "size_bytes": 1158
+    }
+  ],
+  "claims": {
+    "rollback_inputs_available": true,
+    "same_family_stock_write_completed": true,
+    "exact_d219043_mcu_image_available": false,
+    "exact_intake_firmware_round_trip_proven": false,
+    "calibration_round_trip_proven": false,
+    "end_to_end_rollback_gate_passed": false,
+    "firmware_write_allowed": false,
+    "hardware_claim_allowed": false,
+    "field_tx_ready": false
+  },
+  "interpretation": "This manifest proves availability and identity of recovery inputs for receive-only development. It does not prove an exact D219.043 MCU round trip, complete calibration preservation, or the MVP-10.4 end-to-end rollback gate.",
+  "next_gate": "MVP-10.3 must package these inputs without writing a station; MVP-10.4 must execute and verify the end-to-end rollback procedure."
+}

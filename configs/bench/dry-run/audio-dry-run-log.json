@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "artifact_type": "audio_bench_log_template",
+  "status": "dry_run_fixture",
+  "hardware_claim_allowed": false,
+  "field_tx_ready": false,
+  "target_radio_family": "TYT MD-UV380 / MD-UV3x0 class",
+  "operator": "prestation-dry-run",
+  "captured_at_utc": "2026-07-04T00:00:00Z",
+  "lab_setup_ref": "docs/hardware/tyt-md-uv380-phase-a-prestation-prep.md",
+  "convert_to": "out/bench-dry-run/inputs/audio-dry-run.json",
+  "fixture_or_capture_id": "fm_like_clean_voice_v1",
+  "fixture_or_capture_path": "configs/fixtures/audio/fm-like-clean-voice-v1.txt",
+  "artifact_sha256": "692ef261fcc7901ca6c194ed556f48e2401c8343d52b578ce0baef639e51f5d0",
+  "evidence_grade": "fixture_artifact",
+  "codec_class": "opus_class_wideband_speech_proxy",
+  "audio_bandwidth_hz": 8000,
+  "scoring_method": "deterministic_fixture_proxy_v1",
+  "good_voice_threshold": 75,
+  "noise_profiles": [
+    {
+      "noise_profile_id": "clean",
+      "noise_snr_db": 40
+    }
+  ],
+  "loss_profiles": [
+    {
+      "loss_profile_id": "no_loss",
+      "packet_loss_pct": 0,
+      "burst_loss_ms": 0
+    }
+  ],
+  "notes": "Pre-station dry-run fixture. Uses the checked-in audio fixture, not a recorded TYT capture."
+}

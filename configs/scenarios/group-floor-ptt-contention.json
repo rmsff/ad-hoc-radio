@@ -1,0 +1,16 @@
+{
+  "scenario_id": "group_floor_ptt_contention",
+  "seed": 42,
+  "floor_policy": "first_arrival_wins",
+  "access_decision_ms": 20,
+  "floor_release_guard_ms": 20,
+  "first_audio_window_ms": 250,
+  "attempts": [
+    { "event_id": "e1", "source_id": 1, "ptt_start_ms": 0, "talk_duration_ms": 500 },
+    { "event_id": "e2", "source_id": 11, "ptt_start_ms": 0, "talk_duration_ms": 500 },
+    { "event_id": "e3", "source_id": 12, "ptt_start_ms": 300, "talk_duration_ms": 500 },
+    { "event_id": "e4", "source_id": 11, "ptt_start_ms": 800, "talk_duration_ms": 500 },
+    { "event_id": "e5", "source_id": 12, "ptt_start_ms": 1250, "talk_duration_ms": 500 },
+    { "event_id": "e6", "source_id": 12, "ptt_start_ms": 1600, "talk_duration_ms": 500 }
+  ]
+}

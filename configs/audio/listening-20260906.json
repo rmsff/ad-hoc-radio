@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "codec2": {
+    "version": "1.2.0",
+    "commit": "06d4c11e699b0351765f10398abb4f663a984f36",
+    "url": "https://codeload.github.com/drowe67/codec2/tar.gz/06d4c11e699b0351765f10398abb4f663a984f36",
+    "sha256": "5acededfae3cc2ca92d99d03166acae02c3b4062b125a80d394c6e873a768edb",
+    "license": "LGPL-2.1",
+    "license_url": "https://github.com/drowe67/codec2/blob/06d4c11e699b0351765f10398abb4f663a984f36/COPYING"
+  },
+  "seed": 20260906,
+  "packet_ms": 80,
+  "samples": [
+    {
+      "id": "ru01",
+      "kind": "human_recording",
+      "language": "ru",
+      "speaker": "Шантопик",
+      "author": "А. С. Пушкин",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Ru-%D0%95%D1%81%D0%BB%D0%B8_%D0%B6%D0%B8%D0%B7%D0%BD%D1%8C_%D1%82%D0%B5%D0%B1%D1%8F_%D0%BE%D0%B1%D0%BC%D0%B0%D0%BD%D0%B5%D1%82.ogg",
+      "sha256": "3a9479312c5d7a3898cb4bab08d571d616d2aa7ff8ee6d5a7fe84565f4fbeed2",
+      "source_page": "https://commons.wikimedia.org/w/index.php?title=File:Ru-Если_жизнь_тебя_обманет.ogg&oldid=1041723381",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "text_url": "https://ru.wikisource.org/w/index.php?title=Если_жизнь_тебя_обманет_(Пушкин)&oldid=5189918",
+      "transcript_status": "published literary text, not manually time-aligned ground truth",
+      "transcript": "Если жизнь тебя обманет,\nНе печалься, не сердись!\nВ день уныния смирись:\nДень веселья, верь, настанет.\nСердце в будущем живет;\nНастоящее уныло:\nВсе мгновенно, все пройдет;\nЧто пройдет, то будет мило."
+    },
+    {
+      "id": "ru02",
+      "kind": "human_recording",
+      "language": "ru",
+      "speaker": "Шантопик",
+      "author": "А. С. Пушкин",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Ru-%D0%A7%D1%82%D0%BE_%D0%B2_%D0%B8%D0%BC%D0%B5%D0%BD%D0%B8_%D1%82%D0%B5%D0%B1%D0%B5_%D0%BC%D0%BE%D0%B5%D0%BC.ogg",
+      "sha256": "d45a11138b764dbc597fdb0edb7a3f64c048a966c6e91f6d551595711f826815",
+      "source_page": "https://commons.wikimedia.org/w/index.php?title=File:Ru-Что_в_имени_тебе_моем.ogg&oldid=1041724217",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "text_url": "https://ru.wikisource.org/w/index.php?title=Что_в_имени_тебе_моём_(Пушкин)&oldid=1922713",
+      "transcript_status": "published literary text, not manually time-aligned ground truth",
+      "transcript": "Что в имени тебе моём?\nОно умрёт, как шум печальный\nВолны, плеснувшей в берег дальный,\nКак звук ночной в лесу глухом.\nОно на памятном листке\nОставит мёртвый след, подобный\nУзору надписи надгробной\nНа непонятном языке.\nЧто в нём? Забытое давно\nВ волненьях новых и мятежных,\nТвоей душе не даст оно\nВоспоминаний чистых, нежных.\nНо в день печали, в тишине,\nПроизнеси его тоскуя;\nСкажи: есть память обо мне,\nЕсть в мире сердце, где живу я…"
+    }
+  ]
+}

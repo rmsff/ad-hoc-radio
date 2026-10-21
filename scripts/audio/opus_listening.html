@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; media-src file:; base-uri 'none'; form-action 'none'">
+<title>ADHR | Opus 8 кбит/с</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px system-ui, sans-serif; letter-spacing: 0; color: #202624; background: #f5f7f6; }
+header, main, footer { max-width: 1120px; margin: auto; padding: 24px; }
+header { border-bottom: 2px solid #25785e; }
+h1 { margin: 0 0 8px; font-size: 28px; }
+h2 { margin: 0 0 20px; font-size: 22px; }
+h3 { margin: 0; font-size: 17px; }
+p { line-height: 1.5; }
+small, .muted { color: #52605b; }
+a { color: #155e75; text-underline-offset: 3px; }
+button, select, textarea { font: inherit; color: inherit; background: white; border: 1px solid #879b92; border-radius: 4px; padding: 9px; }
+button { cursor: pointer; min-height: 44px; }
+button:hover { background: #edf4f0; }
+:focus-visible { outline: 3px solid #237b99; outline-offset: 3px; }
+header .toolbar { display: flex; gap: 16px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.sample { padding: 12px 0 32px; border-bottom: 1px solid #b5c4bc; margin-bottom: 24px; }
+.track-group { margin: 24px 0; }
+.group-title { padding: 10px 0; border-bottom: 1px solid #aebeb6; color: #27634e; }
+.track-group[data-section="loss"] > .group-title { color: #8b3d49; }
+.track { padding: 16px 0; border-bottom: 1px solid #d5ded9; }
+.playback { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 440px); align-items: center; gap: 20px; }
+.track-name { font-weight: 600; line-height: 1.5; }
+audio { display: block; width: 100%; min-width: 0; height: 44px; }
+details { margin-top: 10px; }
+summary { width: fit-content; cursor: pointer; color: #52605b; padding: 6px 0; }
+.feedback { display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 1fr); gap: 16px; margin-top: 12px; }
+label { display: block; font-size: 14px; }
+select, textarea { display: block; width: 100%; margin-top: 6px; }
+textarea { min-height: 76px; resize: vertical; }
+header, main, footer, .track-name, summary, label, #status { overflow-wrap: anywhere; }
+.error { color: #942b3d; }
+[hidden] { display: none !important; }
+footer { padding-top: 0; font-size: 14px; }
+#status:empty { display: none; }
+@media (max-width: 640px) {
+  header, main, footer { padding: 16px; }
+  h1 { font-size: 24px; }
+  .playback, .feedback { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .sample { margin-bottom: 16px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Opus 8 кбит/с</h1>
+  <p>ADHR · Русская речь · Офлайн-сравнение</p>
+  <p id="fec-note" class="muted" hidden></p>
+  <div class="toolbar">
+    <span id="pack-id" class="muted"></span>
+    <button id="export" type="button">Экспорт JSON</button>
+  </div>
+  <p id="status" role="status" aria-live="polite"></p>
+</header>
+<main id="samples" aria-label="Аудиофрагменты"></main>
+<footer>
+  <p><a href="ATTRIBUTION.txt">Источники и лицензии</a></p>
+  <p>Файловый эксперимент. Качество речи ещё не принято; пригодность MCU, радио и mesh не подтверждена.</p>
+</footer>
+<script id="pack-data" type="application/json">__PACK_DATA__</script>
+<script>
+'use strict';
+const root = document.getElementById('samples');
+const status = document.getElementById('status');
+const exportButton = document.getElementById('export');
+const sections = [['reference', 'Исходники'], ['clean', 'Без потерь'], ['loss', 'Потери пакетов']];
+const fields = [];
+function el(tag, text) {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+function localAudioPath(value) {
+  if (typeof value !== 'string' || !value.trim()) throw new Error('Нет пути аудиофайла');
+  const base = new URL('.', location.href);
+  const url = new URL(value, base);
+  if (url.protocol !== 'file:' || !url.href.startsWith(base.href) || url.search || url.hash) {
+    throw new Error('Аудиофайл должен находиться внутри локального пакета');
+  }
+  return url.href;
+}
+function validate(pack) {
+  if (!pack || typeof pack.pack_id !== 'string' || !pack.pack_id.trim() || !Array.isArray(pack.samples) || !pack.samples.length) {
+    throw new Error('Некорректные данные пакета');
+  }
+  const sampleIDs = new Set();
+  for (const sample of pack.samples) {
+    if (typeof sample.id !== 'string' || !sample.id || sampleIDs.has(sample.id) ||
+        !Number.isFinite(sample.duration_seconds) || sample.duration_seconds <= 0 ||
+        !Array.isArray(sample.tracks) || !sample.tracks.length) throw new Error('Некорректный фрагмент');
+    sampleIDs.add(sample.id);
+    const trackIDs = new Set();
+    for (const track of sample.tracks) {
+      if (typeof track.id !== 'string' || !track.id || trackIDs.has(track.id) ||
+          typeof track.label !== 'string' || !track.label ||
+          !sections.some(([key]) => key === track.section)) throw new Error('Некорректный трек');
+      trackIDs.add(track.id);
+      localAudioPath(track.path);
+    }
+  }
+}
+function feedback(sample, track) {
+  const details = el('details');
+  details.append(el('summary', 'Оценка и заметки (необязательно)'));
+  const form = el('div');
+  form.className = 'feedback';
+  const ratingLabel = el('label', 'Разборчивость');
+  const choice = el('select');
+  choice.setAttribute('aria-label', 'Разборчивость: ' + sample.id + ' · ' + track.label);
+  for (const [value, text] of [
+    ['', 'Без оценки'], ['0', '0 · ничего'], ['1', '1 · отдельные слова'],
+    ['2', '2 · часть фраз'], ['3', '3 · большая часть'],
+    ['4', '4 · почти всё'], ['5', '5 · всё понятно']
+  ]) {
+    const option = el('option', text);
+    option.value = value;
+    choice.append(option);
+  }
+  ratingLabel.append(choice);
+  const notesLabel = el('label', 'Заметки');
+  const notes = el('textarea');
+  notes.setAttribute('aria-label', 'Заметки: ' + sample.id + ' · ' + track.label);
+  notesLabel.append(notes);
+  form.append(ratingLabel, notesLabel);
+  details.append(form);
+  fields.push({sample, track, choice, notes});
+  return details;
+}
+function render(pack) {
+  document.getElementById('pack-id').textContent = pack.pack_id;
+  if (typeof pack.settings?.fec_note === 'string' && pack.settings.fec_note.trim()) {
+    const note = document.getElementById('fec-note');
+    note.textContent = pack.settings.fec_note;
+    note.hidden = false;
+  }
+  for (const sample of pack.samples) {
+    const sampleSection = el('section');
+    sampleSection.className = 'sample';
+    sampleSection.dataset.sampleId = sample.id;
+    sampleSection.append(el('h2', sample.id + ' · ' + sample.duration_seconds.toFixed(2) + ' с'));
+    for (const [key, title] of sections) {
+      const tracks = sample.tracks.filter(track => track.section === key);
+      if (!tracks.length) continue;
+      const group = el('section');
+      group.className = 'track-group';
+      group.dataset.section = key;
+      const heading = el('h3', title);
+      heading.className = 'group-title';
+      group.append(heading);
+      for (const track of tracks) {
+        const row = el('div');
+        row.className = 'track';
+        row.dataset.trackId = track.id;
+        const playback = el('div');
+        playback.className = 'playback';
+        const label = el('div', track.label);
+        label.className = 'track-name';
+        const audio = el('audio');
+        audio.controls = true;
+        audio.preload = 'metadata';
+        audio.setAttribute('aria-label', sample.id + ' · ' + track.label);
+        const error = el('p', 'Аудиофайл недоступен: ' + track.path);
+        error.className = 'error';
+        error.hidden = true;
+        error.setAttribute('role', 'alert');
+        audio.addEventListener('error', () => { error.hidden = false; });
+        audio.src = localAudioPath(track.path);
+        playback.append(label, audio);
+        row.append(playback, error, feedback(sample, track));
+        group.append(row);
+      }
+      sampleSection.append(group);
+    }
+    root.append(sampleSection);
+  }
+  exportButton.onclick = () => {
+    const ratings = fields.filter(({choice, notes}) => choice.value !== '' || notes.value !== '').map(
+      ({sample, track, choice, notes}) => ({
+        sample_id: sample.id, track_id: track.id,
+        rating: choice.value === '' ? null : Number(choice.value), notes: notes.value
+      })
+    );
+    const result = {version: 1, pack_id: pack.pack_id, ratings};
+    const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], {type: 'application/json'}));
+    const link = el('a');
+    link.href = url;
+    link.download = 'opus-listening-feedback.json';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    status.textContent = 'JSON подготовлен к скачиванию.';
+  };
+}
+document.addEventListener('play', event => {
+  if (event.target.tagName === 'AUDIO') {
+    for (const audio of document.querySelectorAll('audio')) if (audio !== event.target) audio.pause();
+  }
+}, true);
+try {
+  const pack = JSON.parse(document.getElementById('pack-data').textContent);
+  validate(pack);
+  render(pack);
+} catch (error) {
+  exportButton.disabled = true;
+  status.className = 'error';
+  status.textContent = 'Не удалось открыть пакет: ' + error.message;
+}
+</script>
+</body>
+</html>

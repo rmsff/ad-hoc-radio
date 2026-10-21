@@ -1,0 +1,76 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Copyright 2026 Ad Hoc Radio Contributors
+ */
+#ifndef ADHR_USB_BENCH_H
+#define ADHR_USB_BENCH_H
+
+#include "adhr/adhr_l2_envelope.h"
+#include "adhr/adhr_mode.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#define ADHR_USB_BENCH_MAGIC 0x41U
+#define ADHR_USB_BENCH_VERSION 0x01U
+#define ADHR_USB_BENCH_REQUEST_HEADER_SIZE 4U
+#define ADHR_USB_BENCH_RESPONSE_HEADER_SIZE 5U
+#define ADHR_USB_BENCH_STATUS_PAYLOAD_SIZE 32U
+#define ADHR_USB_BENCH_MAX_REQUEST_SIZE (ADHR_USB_BENCH_REQUEST_HEADER_SIZE + ADHR_L2_WIRE_SIZE)
+#define ADHR_USB_BENCH_MAX_RESPONSE_SIZE (ADHR_USB_BENCH_RESPONSE_HEADER_SIZE + ADHR_L2_EVENT_WIRE_SIZE)
+
+typedef enum
+{
+	ADHR_USB_BENCH_COMMAND_IDENTITY = 1,
+	ADHR_USB_BENCH_COMMAND_STATUS = 2,
+	ADHR_USB_BENCH_COMMAND_SET_MODE = 3,
+	ADHR_USB_BENCH_COMMAND_INJECT_L2 = 4,
+	ADHR_USB_BENCH_COMMAND_POP_EVENT = 5,
+	ADHR_USB_BENCH_COMMAND_LIFECYCLE = 6,
+	ADHR_USB_BENCH_COMMAND_RESET = 7
+} adhr_usb_bench_command_t;
+
+typedef enum
+{
+	ADHR_USB_BENCH_STATUS_OK = 0,
+	ADHR_USB_BENCH_STATUS_BAD_MAGIC = 1,
+	ADHR_USB_BENCH_STATUS_BAD_VERSION = 2,
+	ADHR_USB_BENCH_STATUS_BAD_LENGTH = 3,
+	ADHR_USB_BENCH_STATUS_BAD_COMMAND = 4,
+	ADHR_USB_BENCH_STATUS_BAD_PAYLOAD = 5,
+	ADHR_USB_BENCH_STATUS_MODE_REJECTED = 6,
+	ADHR_USB_BENCH_STATUS_NO_EVENT = 7,
+	ADHR_USB_BENCH_STATUS_TX_GUARD = 8,
+	ADHR_USB_BENCH_STATUS_INTERNAL = 9
+} adhr_usb_bench_status_t;
+
+enum
+{
+	ADHR_USB_BENCH_CAP_MODE_CONTROL = 0x01,
+	ADHR_USB_BENCH_CAP_L2_INJECTION = 0x02,
+	ADHR_USB_BENCH_CAP_EVENT_QUEUE = 0x04,
+	ADHR_USB_BENCH_CAP_LIFECYCLE = 0x08,
+	ADHR_USB_BENCH_CAP_STATUS = 0x10,
+	ADHR_USB_BENCH_CAP_RX_ONLY = 0x80
+};
+
+enum
+{
+	ADHR_USB_BENCH_TX_TRX_ENABLED = 0x01,
+	ADHR_USB_BENCH_TX_PA_ENABLED = 0x02,
+	ADHR_USB_BENCH_TX_ACTIVE = 0x04,
+	ADHR_USB_BENCH_TX_DMR_ACTIVE = 0x08
+};
+
+typedef struct
+{
+	bool (*set_mode)(adhr_mode_t target);
+	uint8_t (*tx_flags)(void);
+	uint32_t (*tick)(void);
+} adhr_usb_bench_ops_t;
+
+size_t adhrUsbBenchHandle(const uint8_t *request, size_t request_length,
+	uint8_t *response, size_t response_capacity, const adhr_usb_bench_ops_t *ops);
+
+#endif

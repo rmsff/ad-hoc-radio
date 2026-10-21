@@ -1,0 +1,54 @@
+{
+  "contract_version": "adhr-sim-fw-contract-v0",
+  "profile_id": "prestation-openrtx-mduv3x0-receive-only",
+  "profile_status": "prestation_fixture",
+  "radio_family": "TYT MD-UV380 / MD-UV3x0 class",
+  "source_base": {
+    "name": "OpenRTX-derived",
+    "candidate_tag": "v0.4.4",
+    "candidate_commit": "801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+    "target": "mduv3x0"
+  },
+  "safety_profile": {
+    "name": "rx_only",
+    "tx_enabled_by_default": false,
+    "field_tx_allowed": false,
+    "requires_physical_station": false
+  },
+  "node": {
+    "id": "A",
+    "numeric_id": 1,
+    "net_id": 100,
+    "group_id": 10
+  },
+  "timing": {
+    "voice_frame_period_ms": 80,
+    "source_slot_ms": 30,
+    "relay_slot_ms": 20,
+    "guard_ms": 5,
+    "beacon_interval_ms": 60000,
+    "neighbor_stale_ms": 180000,
+    "neighbor_dead_ms": 300000
+  },
+  "channel": {
+    "bandwidth_hz": 25000,
+    "bitrate_bps": 19200,
+    "status": "simulator_assumption_not_hardware_measurement"
+  },
+  "beacon": {
+    "enabled": true,
+    "payload_bytes": 32,
+    "voice_priority_rule": "voice_defer_beacon"
+  },
+  "frame_formats": {
+    "canonical_voice_bytes": 56,
+    "short_voice_bytes": 22,
+    "source": "docs/protocol/frame-contract.md"
+  },
+  "expected_outputs": {
+    "bench_log": "bench_log.jsonl",
+    "bench_summary": "bench_summary.json",
+    "hardware_claim_allowed": false,
+    "field_tx_ready": false
+  }
+}

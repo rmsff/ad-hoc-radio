@@ -1,0 +1,65 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Python experiments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node/TypeScript tooling, if used for simulators or UI
+node_modules/
+dist/
+build/
+coverage/
+.npm/
+.pnpm-store/
+
+# C/C++/embedded builds
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+out/
+*.o
+*.obj
+*.elf
+*.bin
+*.hex
+*.map
+*.uf2
+*.dSYM/
+
+# Rust experiments
+/target/
+Cargo.lock
+
+# SDR / signal artifacts
+*.iq
+*.cfile
+*.wav
+*.raw
+*.bit
+*.dat
+captures/
+recordings/
+
+# Local radio/codeplug artifacts
+.artifacts/
+
+# Local secrets / environment
+.env
+.env.*
+!.env.example
+secrets.*

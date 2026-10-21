@@ -1,0 +1,52 @@
+{
+  "artifact_id": "openrtx-mduv3x0-resource-budget-v0",
+  "status": "isolated_build_measurement",
+  "measured_at": "2026-07-05",
+  "source": {
+    "repo": "https://github.com/OpenRTX/OpenRTX.git",
+    "tag": "v0.4.4",
+    "commit": "801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+    "target": "mduv3x0",
+    "cross_file": "cross_cm4.txt"
+  },
+  "build_environment": {
+    "isolation": "docker linux/amd64",
+    "base_image": "ubuntu:24.04",
+    "base_image_digest": "sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90",
+    "miosix_toolchain": "GCC 9.2.0-mp3.2",
+    "miosix_installer_sha256": "d71fdac28a6fc4a4c0b41e90fb46c3722805b04e1ddb355d0da2f1b67e50ef3e"
+  },
+  "memory_regions": {
+    "flash_available_bytes": 868352,
+    "smallram_available_bytes": 65536,
+    "largeram_available_bytes": 130560,
+    "total_static_ram_regions_bytes": 196096
+  },
+  "measured_size": {
+    "elf_text_bytes": 220596,
+    "elf_data_bytes": 1712,
+    "elf_bss_bytes": 53160,
+    "elf_total_dec_bytes": 275468,
+    "firmware_bin_bytes": 222312,
+    "wrapped_firmware_bytes": 222824,
+    "smallram_static_bytes": 13912,
+    "largeram_static_bss2_bytes": 40960
+  },
+  "remaining_budget": {
+    "flash_remaining_bytes": 646040,
+    "smallram_remaining_bytes": 51624,
+    "largeram_heap_stack_remaining_bytes": 89600
+  },
+  "adhr_planning_budget": {
+    "recommended_flash_addition_limit_bytes": 65536,
+    "recommended_smallram_static_addition_limit_bytes": 8192,
+    "recommended_largeram_dynamic_addition_limit_bytes": 24576,
+    "recommended_cpu_average_budget_pct": 10,
+    "recommended_slot_critical_cpu_budget_pct": 20
+  },
+  "claim_limits": {
+    "firmware_entry_ready": false,
+    "hardware_claim_allowed": false,
+    "field_tx_ready": false
+  }
+}

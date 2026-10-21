@@ -1,0 +1,17 @@
+{
+  "scenario_id": "channel_bench_artifact",
+  "seed": 42,
+  "measurement_source": "fixture_only",
+  "radio_family": "TYT MD-UV380 / MD-UV3x0 class",
+  "test_fixture": true,
+  "measurement_artifact_ref": "",
+  "measurement_artifact_sha256": "",
+  "channel_width_hz": 25000,
+  "gross_bitrate_bps": 19200,
+  "modulation_profile": "custom_2fsk_25khz_fixture",
+  "frames_sent": 1000,
+  "frames_decoded": 1000,
+  "crc_error_count": 0,
+  "duration_ms": 10000,
+  "notes": "fixture-only channel artifact format check, not a hardware claim"
+}

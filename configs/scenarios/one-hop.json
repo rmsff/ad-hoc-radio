@@ -1,0 +1,17 @@
+{
+  "scenario_id": "one_hop_nominal",
+  "seed": 42,
+  "frame_count": 100,
+  "frame_period_ms": 80,
+  "start_ms": 1000,
+  "link_delay_ms": 10,
+  "source_id": 1,
+  "relay_id": 2,
+  "receiver_id": 3,
+  "net_id": 1,
+  "group_id": 100,
+  "call_id": 9001,
+  "ttl": 1,
+  "slot_mode_enabled": false,
+  "slot_duration_ms": 0
+}

@@ -1,0 +1,19 @@
+{
+  "scenario_id": "relay_forward_queue_backpressure",
+  "seed": 42,
+  "frame_count": 6,
+  "frame_period_ms": 20,
+  "start_ms": 0,
+  "link_delay_ms": 10,
+  "source_id": 1,
+  "relay_id": 2,
+  "receiver_id": 3,
+  "net_id": 1,
+  "group_id": 100,
+  "call_id": 9001,
+  "ttl": 1,
+  "slot_mode_enabled": true,
+  "slot_duration_ms": 40,
+  "allow_slot_timing_stress": true,
+  "relay_forward_queue_max_depth": 1
+}

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "library": {
+    "path": "/opt/homebrew/Cellar/opus/1.5.2/lib/libopus.0.dylib",
+    "sha256": "ee46d1051ae34f26632aef504536d008300487e4408c15ab607704ae3fa193c1",
+    "version": "libopus 1.5.2",
+    "license_path": "/opt/homebrew/Cellar/opus/1.5.2/COPYING",
+    "source_url": "https://downloads.xiph.org/releases/opus/opus-1.5.2.tar.gz"
+  },
+  "source_pack": ".artifacts/audio-listening-20260906/pack-a",
+  "source_manifest_sha256": "5a1a9589df055e313bb3e19dbbf471f2b121f41a07a3c760b9be1a1c0c2555fc",
+  "seed": 20260906,
+  "samples": ["ru01", "ru02"],
+  "settings": {
+    "target_bitrate_bps": 8000,
+    "rate_hz": 8000,
+    "packet_ms": 20,
+    "channels": 1,
+    "application": "voip",
+    "bandwidth": "narrowband",
+    "vbr": "constrained",
+    "complexity": 10,
+    "dtx": false,
+    "fec_encoder_loss_percent": 30
+  }
+}

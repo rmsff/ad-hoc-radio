@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ADHR | Прослушивание</title>
+<style>
+*{box-sizing:border-box}body{font:16px system-ui,sans-serif;letter-spacing:0;margin:0;color:#202524;background:#f6f8f7}
+header,main,footer{max-width:1000px;margin:auto;padding:24px}header{border-bottom:2px solid #227b5a}h1{font-size:28px;margin:0 0 8px}h2{font-size:21px}p{line-height:1.5}section{padding:12px 0 30px;border-bottom:1px solid #becbc4}
+.row{display:grid;grid-template-columns:70px minmax(200px,1fr) minmax(180px,240px);gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #dce3df}audio{width:100%;height:42px}select,textarea,button{font:inherit;border:1px solid #a8b7ae;border-radius:4px;padding:9px;background:white;color:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:default}button:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #397fab}textarea{width:100%;min-height:80px;margin:8px 0}pre{white-space:pre-wrap;line-height:1.6;font:inherit}small{color:#52635a}.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px}[hidden]{display:none!important}label{display:block}a{color:#176344}footer{font-size:14px}
+@media(max-width:620px){header,main,footer{padding:16px}.row{grid-template-columns:45px minmax(0,1fr);gap:8px}.row select{grid-column:2}h1{font-size:24px}}
+</style>
+<header><h1>ADHR: прослушивание</h1><p>Русская речь · человеческая запись · 2 фрагмента · Codec2 1600 / 3200</p>
+<small>Файловый эксперимент. Не FM, не радиоканал, не проверка пригодности связи. Потерянные пакеты заменены тишиной.</small></header>
+<main id="samples"></main>
+<footer><div class="controls"><button id="export">Экспорт оценок JSON</button><span id="status" role="status"></span></div>
+<p><a href="ATTRIBUTION.txt">Источники и лицензия CC BY-SA 4.0</a> · Диктор: Шантопик. Текст: А. С. Пушкин. Без одобрения автора записи.</p>
+<small>Источник уже сжат Vorbis. Один диктор; знакомые стихи могут облегчать узнавание. Оценки не отправляются в сеть. Это не стандартизованный MOS-тест.</small></footer>
+<script>
+const samples = __PACK_DATA__;
+const root = document.getElementById('samples');
+const results = {version:1, pack:'audio-listening-20260906', subjective:true, samples:{}};
+const labels = {clean:'без потерь',loss05:'seeded erasure 5%',loss20:'seeded erasure 20%',burst3:'burst 240 мс'};
+function el(tag, text){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e;}
+function player(path){const a=el('audio');a.controls=true;a.preload='metadata';a.src=path;return a;}
+for(const sample of samples){
+  const section=el('section');section.append(el('h2',sample.id.toUpperCase()+' · '+sample.duration_seconds.toFixed(2)+' с'));
+  const state={ratings:{},words:'',familiar:false,revealed:false};results.samples[sample.id]=state;
+  const selects=[];const reveals=[];
+  for(const track of sample.tracks){
+    const row=el('div');row.className='row';const name=el('strong',track.id.slice(-1));
+    const choice=el('select');choice.setAttribute('aria-label','Разборчивость '+track.id);
+    [['','Разборчивость'],['0','0 · ничего'],['1','1 · отдельные слова'],['2','2 · часть фраз'],['3','3 · большая часть'],['4','4 · почти всё'],['5','5 · всё понятно']].forEach(([v,t])=>{const o=el('option',t);o.value=v;choice.append(o);});
+    choice.onchange=()=>{state.ratings[track.id]=Number(choice.value);unlock.disabled=!selects.every(s=>s.value!=='');};
+    selects.push(choice);row.append(name,player(track.path),choice);section.append(row);
+    reveals.push(track.id.slice(-1)+': '+track.mode+' бит/с, '+labels[track.condition]);
+  }
+  const notes=el('label','Услышанные слова / заметки');const area=el('textarea');area.oninput=()=>state.words=area.value;notes.append(area);section.append(notes);
+  const familiar=el('label');const check=el('input');check.type='checkbox';check.onchange=()=>state.familiar=check.checked;familiar.append(check,document.createTextNode(' Текст знаком заранее'));section.append(familiar);
+  const unlock=el('button','Зафиксировать оценки и открыть текст / оригинал');unlock.disabled=true;
+  const answer=el('div');answer.hidden=true;answer.append(el('p',reveals.join(' · ')),el('h3','Опубликованный текст'),el('pre',sample.transcript),el('small','Литературный источник, не выверенная по записи дословная расшифровка.'));
+  answer.append(el('h3','Исходник: PCM из оригинального Ogg'),player(sample.original),el('h3','Reference: PCM 8 кГц до Codec2'),player(sample.reference));
+  unlock.onclick=()=>{if(!selects.every(s=>s.value!==''))return;state.revealed=true;selects.forEach(s=>s.disabled=true);area.disabled=true;check.disabled=true;answer.hidden=false;unlock.disabled=true;};
+  const controls=el('div');controls.className='controls';controls.append(unlock);section.append(controls,answer);root.append(section);
+}
+document.addEventListener('play',e=>{if(e.target.tagName==='AUDIO')document.querySelectorAll('audio').forEach(a=>{if(a!==e.target)a.pause();});},true);
+document.getElementById('export').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(results,null,2)],{type:'application/json'}));const a=el('a');a.href=url;a.download='audio-scores.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);document.getElementById('status').textContent='Экспорт содержит только ваши оценки; автоматического verdict нет.';};
+</script>
+</html>

@@ -1,0 +1,351 @@
+{
+  "schema_version": "adhr-openrtx-rxonly-build-evidence-v1",
+  "story_id": "MVP-10.3",
+  "candidate_id": "openrtx_mduv3x0",
+  "status": "build_verified_not_flashed",
+  "generated_at": "2026-07-12",
+  "bindings": {
+    "handoff": {
+      "path": "configs/firmware-contract/mvp9-radio-backend-handoff.json",
+      "canonical_sha256": "d97a01b0160fe2c125574ffc1c1125a9da20c2d20e0508d35d565977d38ec39a",
+      "content_sha256": "ac7929f61385b98d6450c5bc91442848dd82097da12b67f53f222b6ab87c43f3"
+    },
+    "selection": {
+      "path": "configs/firmware-contract/mvp10-backend-selection.json",
+      "canonical_sha256": "e83f4b00fa43e75b8483d6158fa30951c2ba956893fe9269e9f8cef3d81a630b",
+      "content_sha256": "7bca520a3cb8731bfa7537026f7c6de6cf3da25f49776292f1e83c8953e979fb"
+    },
+    "measurement_contract": {
+      "path": "configs/firmware-contract/mvp10-backend-measurement-contract.json",
+      "canonical_sha256": "1f217ed60af3b8ac67588d8f0bb605c0fb66c955af3d86641214d6d08ff03227",
+      "content_sha256": "294a2e615e2d5270654ebf4653100c84e6a112a6e6d27a30cbcef186113acbd8"
+    }
+  },
+  "source": {
+    "repo": "https://github.com/OpenRTX/OpenRTX.git",
+    "tag": "v0.4.4",
+    "commit": "801fc8dd313eb3ac6f83fd4d3b63ed895effdd56",
+    "target": "mduv3x0",
+    "cross_file": "cross_cm4.txt",
+    "source_date_epoch": 1777626376
+  },
+  "dependency_lock": {
+    "path": "firmware/openrtx-mvp10.3/dependency-lock.json",
+    "sha256": "d9c5025c671d6dd3c1e58409f91e8970b00a07c4e3fc58484500d5b473139555",
+    "wrap_mode": "nodownload",
+    "dependencies": [
+      {
+        "name": "codec2",
+        "repo": "https://github.com/drowe67/codec2-dev",
+        "commit": "a298f3789d7ef9e829049ebe14da8845d97ba8c1",
+        "content_sha256": "c1ad820af8063ee2b638c44c4312a8739b1fe629067326b09c709ce1ce4411ed",
+        "package_overlay": "subprojects/packagefiles/codec2"
+      },
+      {
+        "name": "XPowersLib",
+        "repo": "https://github.com/lewisxhe/XPowersLib.git",
+        "commit": "b0ed896c17d49a1b823ba0a6323cafd89b3a7d91",
+        "content_sha256": "81e3c526eb0d39e7f7fd3d117924020a1d54ac494f78267c663e0f11cd286eea",
+        "package_overlay": "subprojects/packagefiles/XPowersLib"
+      },
+      {
+        "name": "radio_tool",
+        "repo": "https://github.com/v0l/radio_tool",
+        "commit": "6fe15235814a69a0b43f840935000dd5642aa2f4",
+        "content_sha256": "04403bf468a6f7105b52167c8830fd1215b3ad262d9792931136f57c68016963",
+        "package_overlay": "subprojects/packagefiles/radio_tool"
+      }
+    ]
+  },
+  "bundle_files": [
+    {
+      "path": "firmware/openrtx-mvp10.3/existing-files.patch",
+      "sha256": "2a8acc148f616284703ba9623d079de9db407ffe7f82444dc8a695d292cd794e"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/overlay/openrtx/include/rtx/adhr_rxonly.h",
+      "sha256": "ffbf37a0477bb5f28eddfc25c59df5b6f0154361238c6ff4b8570abbe42a2220"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/overlay/openrtx/include/rtx/adhr_tx_queue.h",
+      "sha256": "5f386a91d3f5dba89ff2afadcc1491b556edaa9f058b3e83efac422f36db255d"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/overlay/openrtx/include/rtx/adhr_usb_rxonly.h",
+      "sha256": "171e295dc3b8b8d916a6f3875406310124b2daad17b6d8a74aee44bff5e377fb"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/overlay/openrtx/src/rtx/adhr_rxonly.c",
+      "sha256": "cfc570711130863435acd354cb7a539601a7376c2b220596d6aa5b03ea2775d0"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/overlay/openrtx/src/rtx/adhr_tx_queue.c",
+      "sha256": "78b299a5132b385b550aae6845e69edf90247af78946246416102732148a758a"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/overlay/openrtx/src/rtx/adhr_usb_rxonly.c",
+      "sha256": "bcb0b20135d901bc2be4147c51a11086f1de37510f826e4e1c1b1b3bb528cb35"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/host/adhr_rxonly_host_test.c",
+      "sha256": "180fd53a6aee76f8d2ba73f3782d6f3adbf65301ea8e6381946adfa14cc92af0"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/host/adhr_usb_rxonly_host_test.c",
+      "sha256": "109d8c3bd5db690b649c789588fc4792040bdfeac561f2cda3e48d9ff8f62173"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/host/stubs/drivers/usb_vcom.h",
+      "sha256": "4794738fe78f286781c751f21bc2005232e5ef04d870480404721d6224441cbb"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/host/stubs/interfaces/delays.h",
+      "sha256": "ef1c049cce39467a53d21abf0f651b346ee01b95a75139019ac799d59c40491b"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/run-host-tests.sh",
+      "sha256": "cad2732b3bb9ed9ac5e7958282218eae72bd85e839ff45990e260f216d1fb709"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/prepare-dependencies.sh",
+      "sha256": "2ce350ac76fc4e0eff9e8886b85a8ec48cbd77e4771817890763f3f5d60e5ab3"
+    },
+    {
+      "path": "firmware/openrtx-mvp10.3/build-isolated.sh",
+      "sha256": "be6999d2b5daa8c7b91f55901ce9c7920e74bb427208045a5bef8fc6183b1759"
+    }
+  ],
+  "build_environment": {
+    "isolation": "docker linux/amd64",
+    "builder_image": "adhr-openrtx-builder:ubuntu24-miosix9.2",
+    "builder_image_digest": "sha256:6a25272b232219b3b7201696125c32a54e0c6d018bca823f3a44a87a8f70a93e",
+    "meson": "1.3.2",
+    "miosix_gcc": "9.2.0",
+    "binutils": "2.32",
+    "container_source_path": "/src",
+    "network": "none",
+    "usb_devices_exposed": false,
+    "environment": {
+      "LANG": "C",
+      "LC_ALL": "C",
+      "PYTHONHASHSEED": "0",
+      "SOURCE_DATE_EPOCH": "1777626376",
+      "TZ": "UTC",
+      "ZERO_AR_DATE": "1"
+    }
+  },
+  "build_command": "firmware/openrtx-mvp10.3/build-isolated.sh RUN_ID",
+  "runs": [
+    {
+      "run_id": "build-a",
+      "clean_checkout": true,
+      "artifact_root": ".artifacts/openrtx-mvp10.3/build-a",
+      "artifacts": [
+        {
+          "kind": "elf",
+          "path": ".artifacts/openrtx-mvp10.3/build-a/openrtx_mduv3x0.elf",
+          "size_bytes": 4327876,
+          "sha256": "57d6263e977d9c3f9291b784aa966c5e133a9c205b3a36a0cfbc4b2687c65ae1"
+        },
+        {
+          "kind": "bin",
+          "path": ".artifacts/openrtx-mvp10.3/build-a/openrtx_mduv3x0.bin",
+          "size_bytes": 237744,
+          "sha256": "d1cf3c92afa1bec4c32d9407fb9a149155e8ded85f9d96a9c5d57a2784c2c4aa"
+        },
+        {
+          "kind": "wrap",
+          "path": ".artifacts/openrtx-mvp10.3/build-a/openrtx_mduv3x0.wrap",
+          "size_bytes": 238256,
+          "sha256": "31399b78bf65016b9a2a6186dd6cac471c9855a84b252dde84cd1ee7120ffc4e"
+        },
+        {
+          "kind": "map",
+          "path": ".artifacts/openrtx-mvp10.3/build-a/openrtx_mduv3x0.map",
+          "size_bytes": 899576,
+          "sha256": "5015233cbf2ba76792f8db99ff504d263c72319ba9c7b1b9bef457b2035ac585"
+        },
+        {
+          "kind": "symbols",
+          "path": ".artifacts/openrtx-mvp10.3/build-a/symbols.txt",
+          "size_bytes": 53041,
+          "sha256": "8c196894633922df66248b4b0a8277411da12bcb58fdaf8653ede50f5119ba29"
+        },
+        {
+          "kind": "disassembly",
+          "path": ".artifacts/openrtx-mvp10.3/build-a/disassembly.txt",
+          "size_bytes": 2967848,
+          "sha256": "c90b97603ad8236a9af1867d00816c07dc7fc9c922c97070e2a563ab8af5b827"
+        }
+      ],
+      "build_log_sha256": "bda605ccadd7c4b1901c3c19cdce162a2a60223926df57538a17041cb0216bab"
+    },
+    {
+      "run_id": "build-b",
+      "clean_checkout": true,
+      "artifact_root": ".artifacts/openrtx-mvp10.3/build-b",
+      "artifacts": [
+        {
+          "kind": "elf",
+          "path": ".artifacts/openrtx-mvp10.3/build-b/openrtx_mduv3x0.elf",
+          "size_bytes": 4327876,
+          "sha256": "57d6263e977d9c3f9291b784aa966c5e133a9c205b3a36a0cfbc4b2687c65ae1"
+        },
+        {
+          "kind": "bin",
+          "path": ".artifacts/openrtx-mvp10.3/build-b/openrtx_mduv3x0.bin",
+          "size_bytes": 237744,
+          "sha256": "d1cf3c92afa1bec4c32d9407fb9a149155e8ded85f9d96a9c5d57a2784c2c4aa"
+        },
+        {
+          "kind": "wrap",
+          "path": ".artifacts/openrtx-mvp10.3/build-b/openrtx_mduv3x0.wrap",
+          "size_bytes": 238256,
+          "sha256": "31399b78bf65016b9a2a6186dd6cac471c9855a84b252dde84cd1ee7120ffc4e"
+        },
+        {
+          "kind": "map",
+          "path": ".artifacts/openrtx-mvp10.3/build-b/openrtx_mduv3x0.map",
+          "size_bytes": 899576,
+          "sha256": "5015233cbf2ba76792f8db99ff504d263c72319ba9c7b1b9bef457b2035ac585"
+        },
+        {
+          "kind": "symbols",
+          "path": ".artifacts/openrtx-mvp10.3/build-b/symbols.txt",
+          "size_bytes": 53041,
+          "sha256": "8c196894633922df66248b4b0a8277411da12bcb58fdaf8653ede50f5119ba29"
+        },
+        {
+          "kind": "disassembly",
+          "path": ".artifacts/openrtx-mvp10.3/build-b/disassembly.txt",
+          "size_bytes": 2967848,
+          "sha256": "c90b97603ad8236a9af1867d00816c07dc7fc9c922c97070e2a563ab8af5b827"
+        }
+      ],
+      "build_log_sha256": "3a6ba50369d22752591ea41ff2cb65b10be3fd88dc6f9c1410699daee64b2ba3"
+    }
+  ],
+  "reproducibility": {
+    "verdict": "exact_match",
+    "identical_artifacts": [
+      "elf",
+      "bin",
+      "wrap",
+      "map",
+      "size",
+      "sections",
+      "symbols",
+      "disassembly",
+      "ADHR object undefined symbols",
+      "TX guard disassembly",
+      "USB try-write disassembly",
+      "ADHR protocol strings",
+      "toolchain",
+      "applied source patch",
+      "bundle source hashes",
+      "source isolation"
+    ],
+    "build_logs_identical": false,
+    "build_log_drift_reason": "parallel Ninja progress order only; build logs are informational and not firmware inputs"
+  },
+  "resource_usage": {
+    "text_bytes": 236024,
+    "data_bytes": 1720,
+    "bss_bytes": 56160,
+    "smallram_static_bytes": 16920,
+    "largeram_static_bytes": 40960,
+    "firmware_bin_bytes": 237744,
+    "wrapped_firmware_bytes": 238256,
+    "baseline_delta": {
+      "text_bytes": 15428,
+      "data_bytes": 8,
+      "bss_bytes": 3000,
+      "smallram_static_bytes": 3008,
+      "largeram_static_bytes": 0,
+      "firmware_bin_bytes": 15432,
+      "wrapped_firmware_bytes": 15432
+    },
+    "remaining": {
+      "flash_bytes": 630608,
+      "smallram_bytes": 48616,
+      "largeram_bytes": 89600
+    },
+    "planning_limits_passed": true
+  },
+  "boundary_evidence": {
+    "protocol_version": "ADHR1",
+    "max_line_bytes": 384,
+    "max_frame_bytes": 128,
+    "partial_command_timeout_ms": 1000,
+    "new_thread_created": false,
+    "heap_used": false,
+    "host_tests_passed": true,
+    "tx_guards": [
+      "initial rtxStatus.txDisable=1",
+      "configured rtxStatus.txDisable=1",
+      "radio_enableTx compiles to bx lr",
+      "scheduled_transmit returns unsupported_operation"
+    ],
+    "new_boundary_codec_imports": [],
+    "new_boundary_codec_symbols": [],
+    "broad_target_codec_coupling": "deferred",
+    "broad_target_codec_coupling_reason": "baseline mduv3x0 still links Codec2 and M17 code"
+  },
+  "canonical_evidence": [
+    {
+      "name": "bundle_source_hashes",
+      "sha256": "dab874ff2f8256867ce9e7209664645f34c7fba192bd8e378233d1dff2f5e550"
+    },
+    {
+      "name": "applied_source_patch",
+      "sha256": "0fe7445a8f4bee5ddd320d037191853d8c08a7c55befdc8b01e08c352be0c5b8"
+    },
+    {
+      "name": "undefined_symbols",
+      "sha256": "0177c4f99460b89a9596d3f47de47f17d7948e8c0e4d7093c76c0962e8289120"
+    },
+    {
+      "name": "tx_guard_disassembly",
+      "sha256": "7ed5fe3c6056f256128368a9d237ca96e6826f7f237cc76003aeabdfdf31d864"
+    },
+    {
+      "name": "usb_try_write_disassembly",
+      "sha256": "0dba30f232f75494dc2bec007e5e3d5db9417f9583dbfaa348699b3ef36ed515"
+    },
+    {
+      "name": "protocol_strings",
+      "sha256": "d78abf7c5df1c9370185d2819a9295667ed50269257717c34a5992dc2dcf791b"
+    },
+    {
+      "name": "source_isolation",
+      "sha256": "dc560753283fed6a7d914246fd6d863cf8e12972a1cbed9d1eaabecdf0edc649"
+    },
+    {
+      "name": "size",
+      "sha256": "830da1c0de5121eea6c41eac59c5d77fe163c9d5fa9f88bd761e2b55e6c546c3"
+    },
+    {
+      "name": "sections",
+      "sha256": "edcd3db1e50b0545d2b931f873f052ac2fc14db14fe7b3a315cb354ba303b336"
+    },
+    {
+      "name": "toolchain",
+      "sha256": "18eb851007c3239eb834cd0f349e119c1d9991217ebda6cb7896d581f078b7ba"
+    }
+  ],
+  "rollback_package": {
+    "path": "configs/firmware-contract/openrtx-mduv3x0-adhr-rxonly-rollback.json",
+    "sha256": "72dc9f2ba807d7831f168b6da7d00b69e2651109142ef26fb9b9ff15a0649df5",
+    "execution_gate": "MVP-10.4"
+  },
+  "safety": {
+    "receive_only_default": true,
+    "tx_enabled_by_default": false,
+    "firmware_write_allowed": false,
+    "hardware_claim_allowed": false,
+    "rf_synchronization_claim": false,
+    "field_tx_ready": false,
+    "station_write_performed": false,
+    "usb_device_access_performed": false
+  }
+}

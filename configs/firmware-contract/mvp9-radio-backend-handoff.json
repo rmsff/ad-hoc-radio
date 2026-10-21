@@ -1,0 +1,275 @@
+{
+  "contract_version": "adhr-sim-fw-contract-v1",
+  "story_id": "MVP-9.8",
+  "simulator_gate": {
+    "profile_id": "source_led/project_native_variable",
+    "timing_strategy": "source_led",
+    "opportunity_profile": "project_native_variable",
+    "architecture_verdict": "accepted",
+    "profile_verdict": "go",
+    "stress_evidence_hash": "7883ebade1df42ad1bd5c96302cabdf87e2fd6900b04b0b1507eb12f539aed29",
+    "frame_period_ms": 80,
+    "max_relay_depth": 3,
+    "max_serialized_branch_width": 4,
+    "serialized_single_frequency": true,
+    "spatial_reuse_enabled": false,
+    "dmr_compatible": false,
+    "compatibility_claim": false,
+    "ambe_dependency": false,
+    "rf_synchronization_claim": false
+  },
+  "ownership": {
+    "network_core_owned": [
+      "canonical_frame_identity",
+      "duplicate_suppression",
+      "expected_group_snapshot",
+      "metrics_semantics",
+      "relay_tree_planning",
+      "schedule_versioning",
+      "transmitter_opportunity_order"
+    ],
+    "backend_owned": [
+      "backend_fec",
+      "backend_framing",
+      "backend_modulation",
+      "channel_capacity_measurement",
+      "link_observation",
+      "radio_control",
+      "timing_acquisition_measurement",
+      "tx_rx_turnaround_measurement"
+    ]
+  },
+  "operations": [
+    {
+      "name": "discovery_observation",
+      "direction": "backend_to_core",
+      "required_fields": [
+        "freshness_ms",
+        "observed_at_ms",
+        "station_id"
+      ]
+    },
+    {
+      "name": "link_measurement",
+      "direction": "backend_to_core",
+      "required_fields": [
+        "delay_ms",
+        "from_station_id",
+        "loss_milli_pct",
+        "observed_at_ms",
+        "to_station_id"
+      ]
+    },
+    {
+      "name": "receive_delivery",
+      "direction": "backend_to_core",
+      "required_fields": [
+        "frame_bytes",
+        "monotonic_ms",
+        "rssi_dbm"
+      ]
+    },
+    {
+      "name": "scheduled_transmit",
+      "direction": "core_to_backend",
+      "required_fields": [
+        "backend_clock_id",
+        "call_id",
+        "deadline_monotonic_ms",
+        "frame_bytes",
+        "group_id",
+        "guard_after_ms",
+        "net_id",
+        "not_before_monotonic_ms",
+        "opportunity_duration_ms",
+        "opportunity_index",
+        "opportunity_offset_ms",
+        "owner_station_id",
+        "parent_station_id",
+        "schedule_id",
+        "schedule_version",
+        "seq",
+        "source_id",
+        "timing_authority_id",
+        "timing_epoch_id",
+        "timing_strategy"
+      ]
+    },
+    {
+      "name": "timing_observation",
+      "direction": "backend_to_core",
+      "required_fields": [
+        "acquisition_ms",
+        "drift_ppm",
+        "monotonic_ms",
+        "timing_authority_id",
+        "timing_epoch_id"
+      ]
+    }
+  ],
+  "safety": {
+    "receive_only_default": true,
+    "tx_enabled_by_default": false,
+    "field_tx_allowed": false,
+    "hardware_claim_allowed": false,
+    "regulatory_profile_accepted": false,
+    "lab_safety_plan_accepted": false
+  },
+  "candidates": [
+    {
+      "candidate_id": "opengd77_mduv380",
+      "firmware_base": "OpenGD77",
+      "source_ref": "docs/research/017-opengd77-source-build-intake.md",
+      "verdict": "measurement_required",
+      "gates": [
+        {
+          "name": "channel_capacity",
+          "status": "not_evaluated",
+          "evidence_grade": "none",
+          "reason": "No target-matched custom ADHR channel-capacity measurement exists.",
+          "artifact_refs": []
+        },
+        {
+          "name": "codec_coupling",
+          "status": "not_evaluated",
+          "evidence_grade": "source_reviewed",
+          "reason": "The available intake found DMR and codec coupling that remains unresolved for an AMBE-independent ADHR path.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        },
+        {
+          "name": "lab_safe_measurement",
+          "status": "not_evaluated",
+          "evidence_grade": "none",
+          "reason": "No target-matched receive-only or shielded OpenGD77 ADHR bench slice has passed the lab gate.",
+          "artifact_refs": []
+        },
+        {
+          "name": "license",
+          "status": "not_evaluated",
+          "evidence_grade": "source_reviewed",
+          "reason": "The target source is checksummed, but allowed-use, donor-firmware, codec, and distribution constraints still require a written decision.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        },
+        {
+          "name": "timing_acquisition",
+          "status": "not_evaluated",
+          "evidence_grade": "source_reviewed",
+          "reason": "Relevant timer and radio hooks were identified only in a non-target secondary source and are not measured.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        },
+        {
+          "name": "tx_rx_turnaround",
+          "status": "not_evaluated",
+          "evidence_grade": "source_reviewed",
+          "reason": "No measured OpenGD77 target turnaround artifact exists for the approved simulator profile.",
+          "artifact_refs": [
+            {
+              "path": "docs/research/017-opengd77-source-build-intake.md",
+              "sha256": "6aa79759679ccbca76ad0331aab9e2c42b7571648d710af8616e71c612a1d1bf"
+            }
+          ]
+        }
+      ],
+      "dmr_compatible": false,
+      "compatibility_claim": false,
+      "ambe_dependency": false,
+      "hardware_claim_allowed": false,
+      "field_tx_ready": false
+    },
+    {
+      "candidate_id": "openrtx_mduv3x0",
+      "firmware_base": "OpenRTX",
+      "source_ref": "docs/decisions/ADR-0014-firmware-base-openrtx-now-opengd77-candidate.md",
+      "verdict": "measurement_required",
+      "gates": [
+        {
+          "name": "channel_capacity",
+          "status": "not_evaluated",
+          "evidence_grade": "build_verified",
+          "reason": "The mduv3x0 target builds with resource headroom, but usable ADHR channel capacity is not bench measured.",
+          "artifact_refs": [
+            {
+              "path": "configs/firmware-contract/openrtx-mduv3x0-resource-budget.json",
+              "sha256": "171b08cebbffa2a108ab7016a756d492f0e4e010588749b79f41dc31d0f51fe7"
+            }
+          ]
+        },
+        {
+          "name": "codec_coupling",
+          "status": "not_evaluated",
+          "evidence_grade": "none",
+          "reason": "The selected ADHR firmware path still needs source-level proof that relay forwarding and custom voice operation do not depend on Codec2, M17, DMR, AMBE, or donor codec behavior.",
+          "artifact_refs": []
+        },
+        {
+          "name": "lab_safe_measurement",
+          "status": "not_evaluated",
+          "evidence_grade": "bench_measured",
+          "reason": "A receive-only image was written and booted, but the complete MVP-9 profile lab-safety measurement gate has not passed.",
+          "artifact_refs": [
+            {
+              "path": "configs/firmware-contract/openrtx-mduv3x0-adhr-rxonly-flash-20260708.json",
+              "sha256": "6c63e410b6bdfc30dc96cf5da8f0d51b851d652cca39f5a1662053d423c1fef2"
+            }
+          ]
+        },
+        {
+          "name": "license",
+          "status": "not_evaluated",
+          "evidence_grade": "source_reviewed",
+          "reason": "ADR-0014 selects the research path, but a separate written license and distribution decision is still required.",
+          "artifact_refs": [
+            {
+              "path": "docs/decisions/ADR-0014-firmware-base-openrtx-now-opengd77-candidate.md",
+              "sha256": "89358dd825b7817c617023162aa5949f55f8e63dff755d4eb8b7a0e613c7e3f3"
+            }
+          ]
+        },
+        {
+          "name": "timing_acquisition",
+          "status": "not_evaluated",
+          "evidence_grade": "build_verified",
+          "reason": "Receive telemetry hooks build, but timing acquisition for source-led scheduled operation is not measured.",
+          "artifact_refs": [
+            {
+              "path": "configs/firmware-contract/openrtx-mduv3x0-adhr-telemetry-build-20260708.json",
+              "sha256": "1bc0a0a486b4ad8617bd3b52eff63f40629b2e15fb003f3c55950928abf51d53"
+            }
+          ]
+        },
+        {
+          "name": "tx_rx_turnaround",
+          "status": "not_evaluated",
+          "evidence_grade": "build_verified",
+          "reason": "TX remains compiled out in the receive-only slice, so no accepted turnaround measurement exists.",
+          "artifact_refs": [
+            {
+              "path": "configs/firmware-contract/openrtx-mduv3x0-adhr-telemetry-build-20260708.json",
+              "sha256": "1bc0a0a486b4ad8617bd3b52eff63f40629b2e15fb003f3c55950928abf51d53"
+            }
+          ]
+        }
+      ],
+      "dmr_compatible": false,
+      "compatibility_claim": false,
+      "ambe_dependency": false,
+      "hardware_claim_allowed": false,
+      "field_tx_ready": false
+    }
+  ]
+}

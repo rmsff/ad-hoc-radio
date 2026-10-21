@@ -1,0 +1,27 @@
+{
+  "scenario_id": "audio_intelligibility_fixture_envelope",
+  "seed": 42,
+  "fixture": {
+    "fixture_id": "fm_like_clean_voice_v1",
+    "fixture_path": "configs/fixtures/audio/fm-like-clean-voice-v1.txt",
+    "artifact_sha256": "692ef261fcc7901ca6c194ed556f48e2401c8343d52b578ce0baef639e51f5d0",
+    "evidence_grade": "fixture_artifact"
+  },
+  "noise_profiles": [
+    {
+      "noise_profile_id": "clean",
+      "noise_snr_db": 40
+    }
+  ],
+  "loss_profiles": [
+    {
+      "loss_profile_id": "no_loss",
+      "packet_loss_pct": 0,
+      "burst_loss_ms": 0
+    }
+  ],
+  "codec_class": "opus_class_wideband_speech_proxy",
+  "audio_bandwidth_hz": 8000,
+  "scoring_method": "deterministic_fixture_proxy_v1",
+  "good_voice_threshold": 75
+}
